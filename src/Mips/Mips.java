@@ -39,6 +39,7 @@ public class Mips {
             MipsFuncBuilder mipsFuncBuilder = new MipsFuncBuilder(func,stringCnt,gbc);
             MipsFunc mipsFunc = mipsFuncBuilder.generateMipsFuncs(strings);
             mipsModule.addMipsFunc(mipsFunc);
+            System.out.println("domain output: " + func.domainOutput());
         }
         mipsModule.setGlobalString(strings);
         return mipsModule;

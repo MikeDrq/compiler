@@ -17,244 +17,162 @@ li $fp, 0x10040000
 j main
 
 copyArray1D:
-lw $t0, 8, ($sp)
-sw $t0, 0, ($sp)
-li $t1, 0
-sw $t1, -4, ($sp)
 j label_0
 label_0:
-lw $t1, -4, ($sp)
-sw $t1, -8, ($sp)
-lw $t1, -8, ($sp)
-li $t2, 5
-slt $t3, $t1, $t2
-sw $t3, -12, ($sp)
-lw $t1, -12, ($sp)
-sw $t1, -16, ($sp)
-lw $t1, -16, ($sp)
-li $t2, 0
-sgt $t3, $t1, $t2
-slt $t4, $t1, $t2
-or $t3, $t3, $t4
-sw $t3, -20, ($sp)
-lw $t1, -20, ($sp)
-beq $t1, 0, label_1
+li $t1, 5
+slt $t2, $t0, $t1
+sw $t2, 0, ($sp)
+lw $t0, 0, ($sp)
+sw $t0, -4, ($sp)
+lw $t0, -4, ($sp)
+li $t1, 0
+sgt $t2, $t0, $t1
+slt $t3, $t0, $t1
+or $t2, $t2, $t3
+sw $t2, -8, ($sp)
+lw $t0, -8, ($sp)
+beq $t0, 0, label_1
 j label_2
 label_2:
-lw $t1, 0, ($sp)
-sw $t1, -24, ($sp)
-lw $t1, -4, ($sp)
-sw $t1, -28, ($sp)
-lw $t1, -28, ($sp)
-sll $t1, $t1, 2
-lw $t2, -24, ($sp)
-addu $t1, $t1, $t2
-sw $t1, -32, ($sp)
-lw $t1, -32, ($sp)
-lw $t1, 0, ($t1)
-sw $t1, -36, ($sp)
-lw $t1, -4, ($sp)
-sw $t1, -40, ($sp)
-lw $t1, -40, ($sp)
-sll $t1, $t1, 2
-la $t2, oneDimensionalArray
-addu $t1, $t1, $t2
-sw $t1, -44, ($sp)
-lw $t1, -36, ($sp)
-lw $t2, -44, ($sp)
-sw $t1, 0, ($t2)
+sll $t0, $t0, 2
+lw $t1, 8, ($sp)
+addu $t0, $t0, $t1
+sw $t0, -12, ($sp)
+lw $t0, -12, ($sp)
+lw $t0, 0, ($t0)
+sw $t0, -16, ($sp)
+sll $t0, $t0, 2
+la $t1, oneDimensionalArray
+addu $t0, $t0, $t1
+sw $t0, -20, ($sp)
+lw $t0, -16, ($sp)
+lw $t1, -20, ($sp)
+sw $t0, 0, ($t1)
 j label_3
 label_3:
-lw $t1, -4, ($sp)
-sw $t1, -48, ($sp)
-lw $t1, -48, ($sp)
-li $t2, 1
-addu $t3, $t1, $t2
-sw $t3, -52, ($sp)
-lw $t1, -52, ($sp)
-sw $t1, -4, ($sp)
+li $t1, 1
+addu $t2, $t0, $t1
+sw $t2, -24, ($sp)
 j label_0
 label_1:
-li $t1, 1
-move $v0, $t1
+li $t0, 1
+move $v0, $t0
 jr $ra
 
 copyArray2D:
-lw $t0, 8, ($sp)
-sw $t0, 0, ($sp)
-li $t1, 0
-sw $t1, -8, ($sp)
-li $t1, 0
-sw $t1, -4, ($sp)
 j label_4
 label_4:
-lw $t1, -4, ($sp)
-sw $t1, -12, ($sp)
-lw $t1, -12, ($sp)
-li $t2, 5
-slt $t3, $t1, $t2
-sw $t3, -16, ($sp)
-lw $t1, -16, ($sp)
-sw $t1, -20, ($sp)
-lw $t1, -20, ($sp)
-li $t2, 0
-sgt $t3, $t1, $t2
-slt $t4, $t1, $t2
-or $t3, $t3, $t4
-sw $t3, -24, ($sp)
-lw $t1, -24, ($sp)
-beq $t1, 0, label_5
+li $t1, 5
+slt $t2, $t0, $t1
+sw $t2, 0, ($sp)
+lw $t0, 0, ($sp)
+sw $t0, -4, ($sp)
+lw $t0, -4, ($sp)
+li $t1, 0
+sgt $t2, $t0, $t1
+slt $t3, $t0, $t1
+or $t2, $t2, $t3
+sw $t2, -8, ($sp)
+lw $t0, -8, ($sp)
+beq $t0, 0, label_5
 j label_6
 label_6:
-li $t1, 0
-sw $t1, -8, ($sp)
 j label_7
 label_7:
-lw $t1, -8, ($sp)
-sw $t1, -28, ($sp)
-lw $t1, -28, ($sp)
-li $t2, 5
-slt $t3, $t1, $t2
-sw $t3, -32, ($sp)
-lw $t1, -32, ($sp)
-sw $t1, -36, ($sp)
-lw $t1, -36, ($sp)
-li $t2, 0
-sgt $t3, $t1, $t2
-slt $t4, $t1, $t2
-or $t3, $t3, $t4
-sw $t3, -40, ($sp)
-lw $t1, -40, ($sp)
-beq $t1, 0, label_8
+li $t1, 5
+slt $t2, $t0, $t1
+sw $t2, -12, ($sp)
+lw $t0, -12, ($sp)
+sw $t0, -16, ($sp)
+lw $t0, -16, ($sp)
+li $t1, 0
+sgt $t2, $t0, $t1
+slt $t3, $t0, $t1
+or $t2, $t2, $t3
+sw $t2, -20, ($sp)
+lw $t0, -20, ($sp)
+beq $t0, 0, label_8
 j label_9
 label_9:
-lw $t1, 0, ($sp)
-sw $t1, -44, ($sp)
-lw $t1, -4, ($sp)
-sw $t1, -48, ($sp)
-lw $t1, -8, ($sp)
-sw $t1, -52, ($sp)
-lw $t1, -48, ($sp)
-li $t2, 5
-lw $t3, -52, ($sp)
-mul $t2, $t2, $t1
-addu $t3, $t2, $t3
-sll $t3, $t3, 2
-lw $t4, -44, ($sp)
-addu $t3, $t4, $t3
-sw $t3, -56, ($sp)
-lw $t1, -56, ($sp)
-lw $t1, 0, ($t1)
-sw $t1, -60, ($sp)
-lw $t1, -4, ($sp)
-sw $t1, -64, ($sp)
-lw $t1, -8, ($sp)
-sw $t1, -68, ($sp)
-lw $t1, -64, ($sp)
-li $t2, 5
-lw $t3, -68, ($sp)
-mul $t2, $t2, $t1
-addu $t3, $t2, $t3
-sll $t3, $t3, 2
-la $t4, twoDimensionalArray
-addu $t3, $t3, $t4
-sw $t3, -72, ($sp)
-lw $t1, -60, ($sp)
-lw $t2, -72, ($sp)
-sw $t1, 0, ($t2)
+li $t1, 5
+mul $t1, $t1, $t0
+addu $t2, $t1, $t2
+sll $t2, $t2, 2
+lw $t3, 8, ($sp)
+addu $t2, $t3, $t2
+sw $t2, -24, ($sp)
+lw $t0, -24, ($sp)
+lw $t0, 0, ($t0)
+sw $t0, -28, ($sp)
+li $t1, 5
+mul $t1, $t1, $t0
+addu $t2, $t1, $t2
+sll $t2, $t2, 2
+la $t3, twoDimensionalArray
+addu $t2, $t2, $t3
+sw $t2, -32, ($sp)
+lw $t0, -28, ($sp)
+lw $t1, -32, ($sp)
+sw $t0, 0, ($t1)
 j label_10
 label_10:
-lw $t1, -8, ($sp)
-sw $t1, -76, ($sp)
-lw $t1, -76, ($sp)
-li $t2, 1
-addu $t3, $t1, $t2
-sw $t3, -80, ($sp)
-lw $t1, -80, ($sp)
-sw $t1, -8, ($sp)
+li $t1, 1
+addu $t2, $t0, $t1
+sw $t2, -36, ($sp)
 j label_7
 label_8:
 j label_11
 label_11:
-lw $t1, -4, ($sp)
-sw $t1, -84, ($sp)
-lw $t1, -84, ($sp)
-li $t2, 1
-addu $t3, $t1, $t2
-sw $t3, -88, ($sp)
-lw $t1, -88, ($sp)
-sw $t1, -4, ($sp)
+li $t1, 1
+addu $t2, $t0, $t1
+sw $t2, -40, ($sp)
 j label_4
 label_5:
-li $t1, 1
-move $v0, $t1
+li $t0, 1
+move $v0, $t0
 jr $ra
 
 copy1DInto2D:
-lw $t0, 8, ($sp)
-sw $t0, 0, ($sp)
-lw $t1, 12, ($sp)
-sw $t1, -4, ($sp)
-li $t1, 0
-sw $t1, -8, ($sp)
 j label_12
 label_12:
-lw $t1, -8, ($sp)
-sw $t1, -12, ($sp)
-lw $t1, -12, ($sp)
-li $t2, 5
-slt $t3, $t1, $t2
-sw $t3, -16, ($sp)
-lw $t1, -16, ($sp)
-sw $t1, -20, ($sp)
-lw $t1, -20, ($sp)
-li $t2, 0
-sgt $t3, $t1, $t2
-slt $t4, $t1, $t2
-or $t3, $t3, $t4
-sw $t3, -24, ($sp)
-lw $t1, -24, ($sp)
-beq $t1, 0, label_13
+li $t1, 5
+slt $t2, $t0, $t1
+sw $t2, 0, ($sp)
+lw $t0, 0, ($sp)
+sw $t0, -4, ($sp)
+lw $t0, -4, ($sp)
+li $t1, 0
+sgt $t2, $t0, $t1
+slt $t3, $t0, $t1
+or $t2, $t2, $t3
+sw $t2, -8, ($sp)
+lw $t0, -8, ($sp)
+beq $t0, 0, label_13
 j label_14
 label_14:
-lw $t1, 0, ($sp)
-sw $t1, -28, ($sp)
-lw $t1, -8, ($sp)
-sw $t1, -32, ($sp)
-lw $t1, -32, ($sp)
-sll $t1, $t1, 2
-lw $t2, -28, ($sp)
-addu $t1, $t1, $t2
-sw $t1, -36, ($sp)
-lw $t1, -36, ($sp)
-lw $t1, 0, ($t1)
-sw $t1, -40, ($sp)
-lw $t1, -4, ($sp)
-sw $t1, -44, ($sp)
-lw $t1, -8, ($sp)
-sw $t1, -48, ($sp)
-lw $t1, -44, ($sp)
-li $t2, 5
-lw $t3, -48, ($sp)
-mul $t2, $t2, $t1
-addu $t3, $t2, $t3
-sll $t3, $t3, 2
-la $t4, twoDimensionalArray
-addu $t3, $t3, $t4
-sw $t3, -52, ($sp)
-lw $t1, -40, ($sp)
-lw $t2, -52, ($sp)
-sw $t1, 0, ($t2)
+sll $t0, $t0, 2
+lw $t1, 8, ($sp)
+addu $t0, $t0, $t1
+sw $t0, -12, ($sp)
+lw $t0, -12, ($sp)
+lw $t0, 0, ($t0)
+sw $t0, -16, ($sp)
+lw $t0, 12, ($sp)
+li $t1, 5
+mul $t1, $t1, $t0
+addu $t2, $t1, $t2
+sll $t2, $t2, 2
+la $t3, twoDimensionalArray
+addu $t2, $t2, $t3
+sw $t2, -20, ($sp)
+lw $t0, -16, ($sp)
+lw $t1, -20, ($sp)
+sw $t0, 0, ($t1)
 j label_15
 label_15:
-lw $t1, -8, ($sp)
-sw $t1, -56, ($sp)
-lw $t1, -56, ($sp)
-li $t2, 1
-addu $t3, $t1, $t2
-sw $t3, -60, ($sp)
-lw $t1, -60, ($sp)
-sw $t1, -8, ($sp)
+li $t1, 1
+addu $t2, $t0, $t1
+sw $t2, -24, ($sp)
 j label_12
 label_13:
 jr $ra
@@ -264,276 +182,276 @@ la $a0, str0
 li $v0, 4
 syscall
 addi $t0, $fp, 0
-sw $t0, -8, ($sp)
+sw $t0, 0, ($sp)
 li $t0, 0
 sll $t0, $t0, 2
+lw $t1, 0, ($sp)
+addu $t0, $t0, $t1
+sw $t0, -4, ($sp)
+li $t0, 0
+lw $t1, -4, ($sp)
+sw $t0, 0, ($t1)
+li $t0, 1
+sll $t0, $t0, 2
+lw $t1, 0, ($sp)
+addu $t0, $t0, $t1
+sw $t0, -8, ($sp)
+li $t0, 1
 lw $t1, -8, ($sp)
+sw $t0, 0, ($t1)
+li $t0, 2
+sll $t0, $t0, 2
+lw $t1, 0, ($sp)
 addu $t0, $t0, $t1
 sw $t0, -12, ($sp)
-li $t0, 0
+li $t0, 2
 lw $t1, -12, ($sp)
 sw $t0, 0, ($t1)
-li $t0, 1
+li $t0, 3
 sll $t0, $t0, 2
-lw $t1, -8, ($sp)
+lw $t1, 0, ($sp)
 addu $t0, $t0, $t1
 sw $t0, -16, ($sp)
-li $t0, 1
+li $t0, 3
 lw $t1, -16, ($sp)
 sw $t0, 0, ($t1)
-li $t0, 2
+li $t0, 4
 sll $t0, $t0, 2
-lw $t1, -8, ($sp)
+lw $t1, 0, ($sp)
 addu $t0, $t0, $t1
 sw $t0, -20, ($sp)
-li $t0, 2
+li $t0, 4
 lw $t1, -20, ($sp)
 sw $t0, 0, ($t1)
-li $t0, 3
-sll $t0, $t0, 2
-lw $t1, -8, ($sp)
-addu $t0, $t0, $t1
-sw $t0, -24, ($sp)
-li $t0, 3
-lw $t1, -24, ($sp)
-sw $t0, 0, ($t1)
-li $t0, 4
-sll $t0, $t0, 2
-lw $t1, -8, ($sp)
-addu $t0, $t0, $t1
-sw $t0, -28, ($sp)
-li $t0, 4
-lw $t1, -28, ($sp)
-sw $t0, 0, ($t1)
 addi $t0, $fp, 20
-sw $t0, -32, ($sp)
+sw $t0, -24, ($sp)
 li $t0, 0
 li $t1, 5
 li $t2, 0
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
+addu $t2, $t3, $t2
+sw $t2, -28, ($sp)
+li $t0, 0
+lw $t1, -28, ($sp)
+sw $t0, 0, ($t1)
+li $t0, 0
+li $t1, 5
+li $t2, 1
+mul $t1, $t1, $t0
+addu $t2, $t1, $t2
+sll $t2, $t2, 2
+lw $t3, -24, ($sp)
+addu $t2, $t3, $t2
+sw $t2, -32, ($sp)
+li $t0, 1
+lw $t1, -32, ($sp)
+sw $t0, 0, ($t1)
+li $t0, 0
+li $t1, 5
+li $t2, 2
+mul $t1, $t1, $t0
+addu $t2, $t1, $t2
+sll $t2, $t2, 2
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
 sw $t2, -36, ($sp)
-li $t0, 0
+li $t0, 2
 lw $t1, -36, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 0
 li $t1, 5
-li $t2, 1
+li $t2, 3
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
 sw $t2, -40, ($sp)
-li $t0, 1
+li $t0, 3
 lw $t1, -40, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 0
 li $t1, 5
-li $t2, 2
-mul $t1, $t1, $t0
-addu $t2, $t1, $t2
-sll $t2, $t2, 2
-lw $t3, -32, ($sp)
-addu $t2, $t3, $t2
-sw $t2, -44, ($sp)
-li $t0, 2
-lw $t1, -44, ($sp)
-sw $t0, 0, ($t1)
-li $t0, 0
-li $t1, 5
-li $t2, 3
-mul $t1, $t1, $t0
-addu $t2, $t1, $t2
-sll $t2, $t2, 2
-lw $t3, -32, ($sp)
-addu $t2, $t3, $t2
-sw $t2, -48, ($sp)
-li $t0, 3
-lw $t1, -48, ($sp)
-sw $t0, 0, ($t1)
-li $t0, 0
-li $t1, 5
 li $t2, 4
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
+addu $t2, $t3, $t2
+sw $t2, -44, ($sp)
+li $t0, 4
+lw $t1, -44, ($sp)
+sw $t0, 0, ($t1)
+li $t0, 1
+li $t1, 5
+li $t2, 0
+mul $t1, $t1, $t0
+addu $t2, $t1, $t2
+sll $t2, $t2, 2
+lw $t3, -24, ($sp)
+addu $t2, $t3, $t2
+sw $t2, -48, ($sp)
+li $t0, 10
+lw $t1, -48, ($sp)
+sw $t0, 0, ($t1)
+li $t0, 1
+li $t1, 5
+li $t2, 1
+mul $t1, $t1, $t0
+addu $t2, $t1, $t2
+sll $t2, $t2, 2
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
 sw $t2, -52, ($sp)
-li $t0, 4
+li $t0, 11
 lw $t1, -52, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 1
 li $t1, 5
-li $t2, 0
+li $t2, 2
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
 sw $t2, -56, ($sp)
-li $t0, 10
+li $t0, 12
 lw $t1, -56, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 1
 li $t1, 5
-li $t2, 1
+li $t2, 3
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
 sw $t2, -60, ($sp)
-li $t0, 11
+li $t0, 13
 lw $t1, -60, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 1
 li $t1, 5
-li $t2, 2
-mul $t1, $t1, $t0
-addu $t2, $t1, $t2
-sll $t2, $t2, 2
-lw $t3, -32, ($sp)
-addu $t2, $t3, $t2
-sw $t2, -64, ($sp)
-li $t0, 12
-lw $t1, -64, ($sp)
-sw $t0, 0, ($t1)
-li $t0, 1
-li $t1, 5
-li $t2, 3
-mul $t1, $t1, $t0
-addu $t2, $t1, $t2
-sll $t2, $t2, 2
-lw $t3, -32, ($sp)
-addu $t2, $t3, $t2
-sw $t2, -68, ($sp)
-li $t0, 13
-lw $t1, -68, ($sp)
-sw $t0, 0, ($t1)
-li $t0, 1
-li $t1, 5
 li $t2, 4
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
+addu $t2, $t3, $t2
+sw $t2, -64, ($sp)
+li $t0, 14
+lw $t1, -64, ($sp)
+sw $t0, 0, ($t1)
+li $t0, 2
+li $t1, 5
+li $t2, 0
+mul $t1, $t1, $t0
+addu $t2, $t1, $t2
+sll $t2, $t2, 2
+lw $t3, -24, ($sp)
+addu $t2, $t3, $t2
+sw $t2, -68, ($sp)
+li $t0, 20
+lw $t1, -68, ($sp)
+sw $t0, 0, ($t1)
+li $t0, 2
+li $t1, 5
+li $t2, 1
+mul $t1, $t1, $t0
+addu $t2, $t1, $t2
+sll $t2, $t2, 2
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
 sw $t2, -72, ($sp)
-li $t0, 14
+li $t0, 21
 lw $t1, -72, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 2
 li $t1, 5
-li $t2, 0
+li $t2, 2
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
 sw $t2, -76, ($sp)
-li $t0, 20
+li $t0, 22
 lw $t1, -76, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 2
 li $t1, 5
-li $t2, 1
+li $t2, 3
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
 sw $t2, -80, ($sp)
-li $t0, 21
+li $t0, 23
 lw $t1, -80, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 2
 li $t1, 5
-li $t2, 2
-mul $t1, $t1, $t0
-addu $t2, $t1, $t2
-sll $t2, $t2, 2
-lw $t3, -32, ($sp)
-addu $t2, $t3, $t2
-sw $t2, -84, ($sp)
-li $t0, 22
-lw $t1, -84, ($sp)
-sw $t0, 0, ($t1)
-li $t0, 2
-li $t1, 5
-li $t2, 3
-mul $t1, $t1, $t0
-addu $t2, $t1, $t2
-sll $t2, $t2, 2
-lw $t3, -32, ($sp)
-addu $t2, $t3, $t2
-sw $t2, -88, ($sp)
-li $t0, 23
-lw $t1, -88, ($sp)
-sw $t0, 0, ($t1)
-li $t0, 2
-li $t1, 5
 li $t2, 4
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
+addu $t2, $t3, $t2
+sw $t2, -84, ($sp)
+li $t0, 24
+lw $t1, -84, ($sp)
+sw $t0, 0, ($t1)
+li $t0, 3
+li $t1, 5
+li $t2, 0
+mul $t1, $t1, $t0
+addu $t2, $t1, $t2
+sll $t2, $t2, 2
+lw $t3, -24, ($sp)
+addu $t2, $t3, $t2
+sw $t2, -88, ($sp)
+li $t0, 30
+lw $t1, -88, ($sp)
+sw $t0, 0, ($t1)
+li $t0, 3
+li $t1, 5
+li $t2, 1
+mul $t1, $t1, $t0
+addu $t2, $t1, $t2
+sll $t2, $t2, 2
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
 sw $t2, -92, ($sp)
-li $t0, 24
+li $t0, 31
 lw $t1, -92, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 3
 li $t1, 5
-li $t2, 0
+li $t2, 2
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
 sw $t2, -96, ($sp)
-li $t0, 30
+li $t0, 32
 lw $t1, -96, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 3
 li $t1, 5
-li $t2, 1
-mul $t1, $t1, $t0
-addu $t2, $t1, $t2
-sll $t2, $t2, 2
-lw $t3, -32, ($sp)
-addu $t2, $t3, $t2
-sw $t2, -100, ($sp)
-li $t0, 31
-lw $t1, -100, ($sp)
-sw $t0, 0, ($t1)
-li $t0, 3
-li $t1, 5
-li $t2, 2
-mul $t1, $t1, $t0
-addu $t2, $t1, $t2
-sll $t2, $t2, 2
-lw $t3, -32, ($sp)
-addu $t2, $t3, $t2
-sw $t2, -104, ($sp)
-li $t0, 32
-lw $t1, -104, ($sp)
-sw $t0, 0, ($t1)
-li $t0, 3
-li $t1, 5
 li $t2, 3
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
-sw $t2, -108, ($sp)
+sw $t2, -100, ($sp)
 li $t0, 33
-lw $t1, -108, ($sp)
+lw $t1, -100, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 3
 li $t1, 5
@@ -541,11 +459,11 @@ li $t2, 4
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
-sw $t2, -112, ($sp)
+sw $t2, -104, ($sp)
 li $t0, 34
-lw $t1, -112, ($sp)
+lw $t1, -104, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 4
 li $t1, 5
@@ -553,11 +471,11 @@ li $t2, 0
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
-sw $t2, -116, ($sp)
+sw $t2, -108, ($sp)
 li $t0, 40
-lw $t1, -116, ($sp)
+lw $t1, -108, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 4
 li $t1, 5
@@ -565,11 +483,11 @@ li $t2, 1
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
-sw $t2, -120, ($sp)
+sw $t2, -112, ($sp)
 li $t0, 41
-lw $t1, -120, ($sp)
+lw $t1, -112, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 4
 li $t1, 5
@@ -577,11 +495,11 @@ li $t2, 2
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
-sw $t2, -124, ($sp)
+sw $t2, -116, ($sp)
 li $t0, 42
-lw $t1, -124, ($sp)
+lw $t1, -116, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 4
 li $t1, 5
@@ -589,11 +507,11 @@ li $t2, 3
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
-sw $t2, -128, ($sp)
+sw $t2, -120, ($sp)
 li $t0, 43
-lw $t1, -128, ($sp)
+lw $t1, -120, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 4
 li $t1, 5
@@ -601,86 +519,75 @@ li $t2, 4
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
-sw $t2, -132, ($sp)
+sw $t2, -124, ($sp)
 li $t0, 44
-lw $t1, -132, ($sp)
+lw $t1, -124, ($sp)
 sw $t0, 0, ($t1)
 li $t0, 0
 sll $t0, $t0, 2
-lw $t1, -8, ($sp)
+lw $t1, 0, ($sp)
 addu $t0, $t0, $t1
-sw $t0, -136, ($sp)
-lw $t0, -136, ($sp)
-sw $t0, -140, ($sp)
-sw $ra, -144, ($sp)
-addi $sp, $sp, -148
+sw $t0, -128, ($sp)
+lw $t0, -128, ($sp)
+sw $t0, -132, ($sp)
+sw $ra, -136, ($sp)
+addi $sp, $sp, -140
 addi $fp, $fp, 120
 jal copyArray1D
-addi $sp, $sp, 148
+addi $sp, $sp, 140
 addi $fp, $fp, -120
-lw $ra, -144, ($sp)
-sw $v0, -140, ($sp)
-lw $t0, -140, ($sp)
+lw $ra, -136, ($sp)
+sw $v0, -132, ($sp)
+lw $t0, -132, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -144, ($sp)
-lw $t0, -144, ($sp)
+sw $t2, -136, ($sp)
+lw $t0, -136, ($sp)
 beq $t0, 0, label_16
 j label_17
 label_17:
-li $t0, 0
-sw $t0, 0, ($sp)
 j label_18
 label_18:
-lw $t0, 0, ($sp)
-sw $t0, -148, ($sp)
-lw $t0, -148, ($sp)
 li $t1, 5
 slt $t2, $t0, $t1
-sw $t2, -152, ($sp)
+sw $t2, -140, ($sp)
+lw $t0, -140, ($sp)
+sw $t0, -144, ($sp)
+lw $t0, -144, ($sp)
+li $t1, 0
+sgt $t2, $t0, $t1
+slt $t3, $t0, $t1
+or $t2, $t2, $t3
+sw $t2, -148, ($sp)
+lw $t0, -148, ($sp)
+beq $t0, 0, label_19
+j label_20
+label_20:
+sll $t0, $t0, 2
+la $t1, oneDimensionalArray
+addu $t0, $t0, $t1
+sw $t0, -152, ($sp)
 lw $t0, -152, ($sp)
+lw $t0, 0, ($t0)
 sw $t0, -156, ($sp)
 lw $t0, -156, ($sp)
-li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
 sw $t2, -160, ($sp)
 lw $t0, -160, ($sp)
-beq $t0, 0, label_19
-j label_20
-label_20:
-lw $t0, 0, ($sp)
 sw $t0, -164, ($sp)
 lw $t0, -164, ($sp)
-sll $t0, $t0, 2
-la $t1, oneDimensionalArray
-addu $t0, $t0, $t1
-sw $t0, -168, ($sp)
-lw $t0, -168, ($sp)
-lw $t0, 0, ($t0)
-sw $t0, -172, ($sp)
-lw $t0, 0, ($sp)
-sw $t0, -176, ($sp)
-lw $t0, -172, ($sp)
-lw $t1, -176, ($sp)
-sgt $t2, $t0, $t1
-slt $t3, $t0, $t1
-or $t2, $t2, $t3
-sw $t2, -180, ($sp)
-lw $t0, -180, ($sp)
-sw $t0, -184, ($sp)
-lw $t0, -184, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -188, ($sp)
-lw $t0, -188, ($sp)
+sw $t2, -168, ($sp)
+lw $t0, -168, ($sp)
 beq $t0, 0, label_21
 j label_22
 label_22:
@@ -688,76 +595,57 @@ j label_19
 label_21:
 j label_23
 label_23:
-lw $t0, 0, ($sp)
-sw $t0, -192, ($sp)
-lw $t0, -192, ($sp)
 li $t1, 1
 addu $t2, $t0, $t1
-sw $t2, -196, ($sp)
-lw $t0, -196, ($sp)
-sw $t0, 0, ($sp)
+sw $t2, -172, ($sp)
 j label_18
 label_19:
-lw $t0, 0, ($sp)
-sw $t0, -200, ($sp)
-lw $t0, -200, ($sp)
+lw $t0, -172, ($sp)
 li $t1, 5
 sge $t2, $t0, $t1
 sle $t3, $t0, $t1
 and $t2, $t2, $t3
-sw $t2, -204, ($sp)
-lw $t0, -204, ($sp)
-sw $t0, -208, ($sp)
-lw $t0, -208, ($sp)
+sw $t2, -176, ($sp)
+lw $t0, -176, ($sp)
+sw $t0, -180, ($sp)
+lw $t0, -180, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -212, ($sp)
-lw $t0, -212, ($sp)
+sw $t2, -184, ($sp)
+lw $t0, -184, ($sp)
 beq $t0, 0, label_24
 j label_25
 label_25:
 la $a0, str1
 li $v0, 4
 syscall
-li $t0, 1
-sw $t0, -216, ($sp)
 j label_26
 label_26:
-lw $t0, -216, ($sp)
-sw $t0, -220, ($sp)
-lw $t0, -220, ($sp)
 li $t1, 1000
 slt $t2, $t0, $t1
-sw $t2, -224, ($sp)
-lw $t0, -224, ($sp)
-sw $t0, -228, ($sp)
-lw $t0, -228, ($sp)
+sw $t2, -188, ($sp)
+lw $t0, -188, ($sp)
+sw $t0, -192, ($sp)
+lw $t0, -192, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -232, ($sp)
-lw $t0, -232, ($sp)
+sw $t2, -196, ($sp)
+lw $t0, -196, ($sp)
 beq $t0, 0, label_27
 j label_28
 label_28:
-lw $t0, -216, ($sp)
-sw $t0, -236, ($sp)
-lw $t0, -236, ($sp)
 li $t1, 2
 mul $t2, $t0, $t1
-sw $t2, -240, ($sp)
-lw $t0, -240, ($sp)
-sw $t0, -216, ($sp)
+sw $t2, -200, ($sp)
 j label_29
 label_29:
 j label_26
 label_27:
-lw $t0, -216, ($sp)
-sw $t0, -244, ($sp)
-lw $t0, -244, ($sp)
+lw $t0, -200, ($sp)
 move $a0, $t0
 li $v0, 1
 syscall
@@ -768,86 +656,62 @@ j label_24
 label_24:
 j label_16
 label_16:
-li $t0, 1
-sw $t0, -248, ($sp)
 j label_30
 label_30:
-lw $t0, -248, ($sp)
-sw $t0, -252, ($sp)
-lw $t0, -252, ($sp)
 li $t1, 1000
 slt $t2, $t0, $t1
-sw $t2, -256, ($sp)
-lw $t0, -256, ($sp)
-sw $t0, -260, ($sp)
-lw $t0, -260, ($sp)
+sw $t2, -204, ($sp)
+lw $t0, -204, ($sp)
+sw $t0, -208, ($sp)
+lw $t0, -208, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -264, ($sp)
-lw $t0, -264, ($sp)
+sw $t2, -212, ($sp)
+lw $t0, -212, ($sp)
 beq $t0, 0, label_31
 j label_32
 label_32:
-lw $t0, -248, ($sp)
-sw $t0, -268, ($sp)
-lw $t0, -268, ($sp)
 li $t1, 2
 mul $t2, $t0, $t1
-sw $t2, -272, ($sp)
-lw $t0, -272, ($sp)
-sw $t0, -248, ($sp)
+sw $t2, -216, ($sp)
 j label_33
 label_33:
 j label_30
 label_31:
-lw $t0, -248, ($sp)
-sw $t0, -276, ($sp)
-lw $t0, -276, ($sp)
+lw $t0, -216, ($sp)
 move $a0, $t0
 li $v0, 1
 syscall
 la $a0, str3
 li $v0, 4
 syscall
-li $t0, 1
-sw $t0, -280, ($sp)
 j label_34
 label_34:
-lw $t0, -280, ($sp)
-sw $t0, -284, ($sp)
-lw $t0, -284, ($sp)
 li $t1, 1000
 slt $t2, $t0, $t1
-sw $t2, -288, ($sp)
-lw $t0, -288, ($sp)
-sw $t0, -292, ($sp)
-lw $t0, -292, ($sp)
+sw $t2, -220, ($sp)
+lw $t0, -220, ($sp)
+sw $t0, -224, ($sp)
+lw $t0, -224, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -296, ($sp)
-lw $t0, -296, ($sp)
+sw $t2, -228, ($sp)
+lw $t0, -228, ($sp)
 beq $t0, 0, label_35
 j label_36
 label_36:
-lw $t0, -280, ($sp)
-sw $t0, -300, ($sp)
-lw $t0, -300, ($sp)
 li $t1, 2
 mul $t2, $t0, $t1
-sw $t2, -304, ($sp)
-lw $t0, -304, ($sp)
-sw $t0, -280, ($sp)
+sw $t2, -232, ($sp)
 j label_37
 label_37:
 j label_34
 label_35:
-lw $t0, -280, ($sp)
-sw $t0, -308, ($sp)
-lw $t0, -308, ($sp)
+lw $t0, -232, ($sp)
 move $a0, $t0
 li $v0, 1
 syscall
@@ -860,116 +724,94 @@ li $t2, 0
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
-sw $t2, -312, ($sp)
-lw $t0, -312, ($sp)
-sw $t0, -316, ($sp)
-sw $ra, -320, ($sp)
-addi $sp, $sp, -324
+sw $t2, -236, ($sp)
+lw $t0, -236, ($sp)
+sw $t0, -240, ($sp)
+sw $ra, -244, ($sp)
+addi $sp, $sp, -248
 addi $fp, $fp, 120
 jal copyArray2D
-addi $sp, $sp, 324
+addi $sp, $sp, 248
 addi $fp, $fp, -120
-lw $ra, -320, ($sp)
-sw $v0, -316, ($sp)
-lw $t0, -316, ($sp)
+lw $ra, -244, ($sp)
+sw $v0, -240, ($sp)
+lw $t0, -240, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -320, ($sp)
-lw $t0, -320, ($sp)
+sw $t2, -244, ($sp)
+lw $t0, -244, ($sp)
 beq $t0, 0, label_38
 j label_39
 label_39:
-li $t0, 0
-sw $t0, 0, ($sp)
 j label_40
 label_40:
-lw $t0, 0, ($sp)
-sw $t0, -324, ($sp)
-lw $t0, -324, ($sp)
 li $t1, 5
 slt $t2, $t0, $t1
-sw $t2, -328, ($sp)
-lw $t0, -328, ($sp)
-sw $t0, -332, ($sp)
-lw $t0, -332, ($sp)
+sw $t2, -248, ($sp)
+lw $t0, -248, ($sp)
+sw $t0, -252, ($sp)
+lw $t0, -252, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -336, ($sp)
-lw $t0, -336, ($sp)
+sw $t2, -256, ($sp)
+lw $t0, -256, ($sp)
 beq $t0, 0, label_41
 j label_42
 label_42:
-li $t0, 0
-sw $t0, -4, ($sp)
 j label_43
 label_43:
-lw $t0, -4, ($sp)
-sw $t0, -340, ($sp)
-lw $t0, -340, ($sp)
 li $t1, 5
 slt $t2, $t0, $t1
-sw $t2, -344, ($sp)
-lw $t0, -344, ($sp)
-sw $t0, -348, ($sp)
-lw $t0, -348, ($sp)
+sw $t2, -260, ($sp)
+lw $t0, -260, ($sp)
+sw $t0, -264, ($sp)
+lw $t0, -264, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -352, ($sp)
-lw $t0, -352, ($sp)
+sw $t2, -268, ($sp)
+lw $t0, -268, ($sp)
 beq $t0, 0, label_44
 j label_45
 label_45:
-lw $t0, 0, ($sp)
-sw $t0, -356, ($sp)
-lw $t0, -4, ($sp)
-sw $t0, -360, ($sp)
-lw $t0, -356, ($sp)
 li $t1, 5
-lw $t2, -360, ($sp)
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
 la $t3, twoDimensionalArray
 addu $t2, $t2, $t3
-sw $t2, -364, ($sp)
-lw $t0, -364, ($sp)
+sw $t2, -272, ($sp)
+lw $t0, -272, ($sp)
 lw $t0, 0, ($t0)
-sw $t0, -368, ($sp)
-lw $t0, 0, ($sp)
-sw $t0, -372, ($sp)
-lw $t0, -372, ($sp)
+sw $t0, -276, ($sp)
 li $t1, 10
 mul $t2, $t0, $t1
-sw $t2, -376, ($sp)
-lw $t0, -4, ($sp)
-sw $t0, -380, ($sp)
-lw $t0, -376, ($sp)
-lw $t1, -380, ($sp)
+sw $t2, -280, ($sp)
+lw $t0, -280, ($sp)
 addu $t2, $t0, $t1
-sw $t2, -384, ($sp)
-lw $t0, -368, ($sp)
-lw $t1, -384, ($sp)
+sw $t2, -284, ($sp)
+lw $t0, -276, ($sp)
+lw $t1, -284, ($sp)
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -388, ($sp)
-lw $t0, -388, ($sp)
-sw $t0, -392, ($sp)
-lw $t0, -392, ($sp)
+sw $t2, -288, ($sp)
+lw $t0, -288, ($sp)
+sw $t0, -292, ($sp)
+lw $t0, -292, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -396, ($sp)
-lw $t0, -396, ($sp)
+sw $t2, -296, ($sp)
+lw $t0, -296, ($sp)
 beq $t0, 0, label_46
 j label_47
 label_47:
@@ -977,33 +819,26 @@ j label_44
 label_46:
 j label_48
 label_48:
-lw $t0, -4, ($sp)
-sw $t0, -400, ($sp)
-lw $t0, -400, ($sp)
 li $t1, 1
 addu $t2, $t0, $t1
-sw $t2, -404, ($sp)
-lw $t0, -404, ($sp)
-sw $t0, -4, ($sp)
+sw $t2, -300, ($sp)
 j label_43
 label_44:
-lw $t0, -4, ($sp)
-sw $t0, -408, ($sp)
-lw $t0, -408, ($sp)
+lw $t0, -300, ($sp)
 li $t1, 5
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -412, ($sp)
-lw $t0, -412, ($sp)
-sw $t0, -416, ($sp)
-lw $t0, -416, ($sp)
+sw $t2, -304, ($sp)
+lw $t0, -304, ($sp)
+sw $t0, -308, ($sp)
+lw $t0, -308, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -420, ($sp)
-lw $t0, -420, ($sp)
+sw $t2, -312, ($sp)
+lw $t0, -312, ($sp)
 beq $t0, 0, label_49
 j label_50
 label_50:
@@ -1011,53 +846,43 @@ j label_41
 label_49:
 j label_51
 label_51:
-lw $t0, 0, ($sp)
-sw $t0, -424, ($sp)
-lw $t0, -424, ($sp)
 li $t1, 1
 addu $t2, $t0, $t1
-sw $t2, -428, ($sp)
-lw $t0, -428, ($sp)
-sw $t0, 0, ($sp)
+sw $t2, -316, ($sp)
 j label_40
 label_41:
-lw $t0, 0, ($sp)
-sw $t0, -432, ($sp)
-lw $t0, -432, ($sp)
+lw $t0, -316, ($sp)
 li $t1, 5
 sge $t2, $t0, $t1
 sle $t3, $t0, $t1
 and $t2, $t2, $t3
-sw $t2, -436, ($sp)
-lw $t0, -436, ($sp)
-sw $t0, -440, ($sp)
-lw $t0, -440, ($sp)
+sw $t2, -320, ($sp)
+lw $t0, -320, ($sp)
+sw $t0, -324, ($sp)
+lw $t0, -324, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -444, ($sp)
-lw $t0, -444, ($sp)
+sw $t2, -328, ($sp)
+lw $t0, -328, ($sp)
 beq $t0, 0, label_52
 j label_53
 label_53:
-lw $t0, -4, ($sp)
-sw $t0, -448, ($sp)
-lw $t0, -448, ($sp)
 li $t1, 5
 sge $t2, $t0, $t1
 sle $t3, $t0, $t1
 and $t2, $t2, $t3
-sw $t2, -452, ($sp)
-lw $t0, -452, ($sp)
-sw $t0, -456, ($sp)
-lw $t0, -456, ($sp)
+sw $t2, -332, ($sp)
+lw $t0, -332, ($sp)
+sw $t0, -336, ($sp)
+lw $t0, -336, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -460, ($sp)
-lw $t0, -460, ($sp)
+sw $t2, -340, ($sp)
+lw $t0, -340, ($sp)
 beq $t0, 0, label_54
 j label_55
 label_55:
@@ -1070,43 +895,31 @@ j label_52
 label_52:
 j label_38
 label_38:
-li $t0, 1
-sw $t0, -464, ($sp)
 j label_56
 label_56:
-lw $t0, -464, ($sp)
-sw $t0, -468, ($sp)
-lw $t0, -468, ($sp)
 li $t1, 1000
 slt $t2, $t0, $t1
-sw $t2, -472, ($sp)
-lw $t0, -472, ($sp)
-sw $t0, -476, ($sp)
-lw $t0, -476, ($sp)
+sw $t2, -344, ($sp)
+lw $t0, -344, ($sp)
+sw $t0, -348, ($sp)
+lw $t0, -348, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -480, ($sp)
-lw $t0, -480, ($sp)
+sw $t2, -352, ($sp)
+lw $t0, -352, ($sp)
 beq $t0, 0, label_57
 j label_58
 label_58:
-lw $t0, -464, ($sp)
-sw $t0, -484, ($sp)
-lw $t0, -484, ($sp)
 li $t1, 2
 mul $t2, $t0, $t1
-sw $t2, -488, ($sp)
-lw $t0, -488, ($sp)
-sw $t0, -464, ($sp)
+sw $t2, -356, ($sp)
 j label_59
 label_59:
 j label_56
 label_57:
-lw $t0, -464, ($sp)
-sw $t0, -492, ($sp)
-lw $t0, -492, ($sp)
+lw $t0, -356, ($sp)
 move $a0, $t0
 li $v0, 1
 syscall
@@ -1119,73 +932,62 @@ li $t2, 0
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
-lw $t3, -32, ($sp)
+lw $t3, -24, ($sp)
 addu $t2, $t3, $t2
-sw $t2, -496, ($sp)
+sw $t2, -360, ($sp)
 li $t0, 1
-sw $t0, -500, ($sp)
-lw $t0, -496, ($sp)
-sw $t0, -504, ($sp)
-sw $ra, -508, ($sp)
-addi $sp, $sp, -512
+sw $t0, -364, ($sp)
+lw $t0, -360, ($sp)
+sw $t0, -368, ($sp)
+sw $ra, -372, ($sp)
+addi $sp, $sp, -376
 addi $fp, $fp, 120
 jal copy1DInto2D
-addi $sp, $sp, 512
+addi $sp, $sp, 376
 addi $fp, $fp, -120
-lw $ra, -508, ($sp)
-li $t0, 0
-sw $t0, 0, ($sp)
+lw $ra, -372, ($sp)
 j label_60
 label_60:
-lw $t0, 0, ($sp)
-sw $t0, -500, ($sp)
-lw $t0, -500, ($sp)
 li $t1, 5
 slt $t2, $t0, $t1
-sw $t2, -504, ($sp)
-lw $t0, -504, ($sp)
-sw $t0, -508, ($sp)
-lw $t0, -508, ($sp)
+sw $t2, -364, ($sp)
+lw $t0, -364, ($sp)
+sw $t0, -368, ($sp)
+lw $t0, -368, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -512, ($sp)
-lw $t0, -512, ($sp)
+sw $t2, -372, ($sp)
+lw $t0, -372, ($sp)
 beq $t0, 0, label_61
 j label_62
 label_62:
-lw $t0, 0, ($sp)
-sw $t0, -516, ($sp)
 li $t0, 1
 li $t1, 5
-lw $t2, -516, ($sp)
 mul $t1, $t1, $t0
 addu $t2, $t1, $t2
 sll $t2, $t2, 2
 la $t3, twoDimensionalArray
 addu $t2, $t2, $t3
-sw $t2, -520, ($sp)
-lw $t0, -520, ($sp)
+sw $t2, -376, ($sp)
+lw $t0, -376, ($sp)
 lw $t0, 0, ($t0)
-sw $t0, -524, ($sp)
-lw $t0, 0, ($sp)
-sw $t0, -528, ($sp)
-lw $t0, -524, ($sp)
-lw $t1, -528, ($sp)
+sw $t0, -380, ($sp)
+lw $t0, -380, ($sp)
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -532, ($sp)
-lw $t0, -532, ($sp)
-sw $t0, -536, ($sp)
-lw $t0, -536, ($sp)
+sw $t2, -384, ($sp)
+lw $t0, -384, ($sp)
+sw $t0, -388, ($sp)
+lw $t0, -388, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -540, ($sp)
-lw $t0, -540, ($sp)
+sw $t2, -392, ($sp)
+lw $t0, -392, ($sp)
 beq $t0, 0, label_63
 j label_64
 label_64:
@@ -1193,76 +995,57 @@ j label_61
 label_63:
 j label_65
 label_65:
-lw $t0, 0, ($sp)
-sw $t0, -544, ($sp)
-lw $t0, -544, ($sp)
 li $t1, 1
 addu $t2, $t0, $t1
-sw $t2, -548, ($sp)
-lw $t0, -548, ($sp)
-sw $t0, 0, ($sp)
+sw $t2, -396, ($sp)
 j label_60
 label_61:
-li $t0, 1
-sw $t0, -552, ($sp)
 j label_66
 label_66:
-lw $t0, -552, ($sp)
-sw $t0, -556, ($sp)
-lw $t0, -556, ($sp)
 li $t1, 1000
 slt $t2, $t0, $t1
-sw $t2, -560, ($sp)
-lw $t0, -560, ($sp)
-sw $t0, -564, ($sp)
-lw $t0, -564, ($sp)
+sw $t2, -400, ($sp)
+lw $t0, -400, ($sp)
+sw $t0, -404, ($sp)
+lw $t0, -404, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -568, ($sp)
-lw $t0, -568, ($sp)
+sw $t2, -408, ($sp)
+lw $t0, -408, ($sp)
 beq $t0, 0, label_67
 j label_68
 label_68:
-lw $t0, -552, ($sp)
-sw $t0, -572, ($sp)
-lw $t0, -572, ($sp)
 li $t1, 2
 mul $t2, $t0, $t1
-sw $t2, -576, ($sp)
-lw $t0, -576, ($sp)
-sw $t0, -552, ($sp)
+sw $t2, -412, ($sp)
 j label_69
 label_69:
 j label_66
 label_67:
-lw $t0, -552, ($sp)
-sw $t0, -580, ($sp)
-lw $t0, -580, ($sp)
+lw $t0, -412, ($sp)
 move $a0, $t0
 li $v0, 1
 syscall
 la $a0, str7
 li $v0, 4
 syscall
-lw $t0, 0, ($sp)
-sw $t0, -584, ($sp)
-lw $t0, -584, ($sp)
+lw $t0, -396, ($sp)
 li $t1, 5
 sge $t2, $t0, $t1
 sle $t3, $t0, $t1
 and $t2, $t2, $t3
-sw $t2, -588, ($sp)
-lw $t0, -588, ($sp)
-sw $t0, -592, ($sp)
-lw $t0, -592, ($sp)
+sw $t2, -416, ($sp)
+lw $t0, -416, ($sp)
+sw $t0, -420, ($sp)
+lw $t0, -420, ($sp)
 li $t1, 0
 sgt $t2, $t0, $t1
 slt $t3, $t0, $t1
 or $t2, $t2, $t3
-sw $t2, -596, ($sp)
-lw $t0, -596, ($sp)
+sw $t2, -424, ($sp)
+lw $t0, -424, ($sp)
 beq $t0, 0, label_70
 j label_71
 label_71:

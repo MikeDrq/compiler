@@ -5,6 +5,8 @@ import Middle.Type.PointerType;
 import Middle.Type.ValueType;
 import Middle.Value.Instruction.Instruction;
 
+import java.util.ArrayList;
+
 public class Getelementptr extends Instruction {
 
     private LlvmIrValue base;
@@ -141,5 +143,37 @@ public class Getelementptr extends Instruction {
             }
         }
         return s;
+    }
+
+    @Override
+    public ArrayList<LlvmIrValue> getOperand() {
+        ArrayList<LlvmIrValue> h = new ArrayList<>();
+        h.add(base);
+        if (offset_row_value != null) {
+            h.add(offset_row_value);
+        }
+        if (offset_column_value != null) {
+            h.add(offset_column_value);
+        }
+        return h;
+    }
+
+    @Override
+    public void change(String name,LlvmIrValue l) {
+        if (base.getName().equals(name)) {
+            this.base = l;
+        }
+        if (offset_column_value != null) {
+            if (offset_column_value.getName().equals(name)) {
+                offset_column_value = l;
+                offset_column = l.getName();
+            }
+        }
+        if (offset_row_value != null) {
+            if (offset_row_value.getName().equals(name)) {
+                offset_row_value = l;
+                offset_row = l.getName();
+            }
+        }
     }
 }

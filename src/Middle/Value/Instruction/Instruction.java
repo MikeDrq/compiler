@@ -4,6 +4,8 @@ import Middle.LlvmIrValue;
 import Middle.Type.ValueType;
 import Middle.Value.BasicBlock.BasicBlock;
 
+import java.util.ArrayList;
+
 public class Instruction extends LlvmIrValue {
     private BasicBlock basicBlock;
 
@@ -16,9 +18,19 @@ public class Instruction extends LlvmIrValue {
         this.basicBlock = basicBlock;
     }
 
+    public ArrayList<LlvmIrValue> getOperand() {
+        ArrayList<LlvmIrValue> h = new ArrayList<>();
+        return h;
+    }
+
+    public void change(String name,LlvmIrValue llvmIrValue) {
+
+    }
+
     public String midOutput() {
         String s = "";
         return s;
     }
+
 
 }

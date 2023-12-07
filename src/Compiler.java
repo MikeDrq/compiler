@@ -4,6 +4,7 @@ import Lexer.Lexer;
 import java.io.*;
 import java.util.ArrayList;
 import Lexer.Token;
+import Mem2Reg.MemToReg;
 import Middle.LlvmIr;
 import Middle.LlvmIrModule;
 import Middle.LlvmIrValue;
@@ -29,6 +30,7 @@ public class Compiler {
         boolean testMid = true;
         boolean testMips = true;
         boolean hasError = false;
+        boolean isCompetition = true;
         try(BufferedReader br = new BufferedReader(new FileReader(input))) {
             while((line = br.readLine()) != null) {
                 content.append(line).append('\n');
@@ -41,6 +43,7 @@ public class Compiler {
         }
         Lexer lexer = new Lexer(content.toString());
         tokenList = lexer.analysis();
+
         Parser parser = new Parser(tokenList);
         CompUnitNode compUnitNode = parser.parseCompUnit();
         //writer.write(compUnitNode.print());
@@ -60,8 +63,18 @@ public class Compiler {
         if (!hasError) {
             LlvmIr llvmIr = new LlvmIr(compUnitNode);
             LlvmIrModule llvmIrModule = llvmIr.generateIrModule();
-            if (testMid) {
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(mid_output))) {
+                    ArrayList<String> ans = llvmIrModule.midOutput();
+                    for (String s : ans) {
+                        writer.write(s);
+                    }
+                } catch (IOException e) {
+                    System.out.println("output.txt 写入失败");
+                }
+            if (isCompetition) {
+                MemToReg memToReg = new MemToReg(llvmIrModule);
+                memToReg.doMemToReg();
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter("1.txt"))) {
                     ArrayList<String> ans = llvmIrModule.midOutput();
                     for (String s : ans) {
                         writer.write(s);

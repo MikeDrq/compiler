@@ -4,6 +4,8 @@ import Middle.LlvmIrValue;
 import Middle.Type.ValueType;
 import Middle.Value.Instruction.Instruction;
 
+import java.util.ArrayList;
+
 public class Ret extends Instruction {
     private boolean isVoid;
     private LlvmIrValue right;
@@ -35,5 +37,26 @@ public class Ret extends Instruction {
             s = s + right.getType().midOutput() + " " + right.getName() + "\n";
         }
         return s;
+    }
+
+    @Override
+    public ArrayList<LlvmIrValue> getOperand() {
+        ArrayList<LlvmIrValue> h = new ArrayList<>();
+        if (!isVoid) {
+            h.add(right);
+        }
+        return h;
+    }
+
+
+    @Override
+    public void change(String name,LlvmIrValue llvmIrValue) {
+       if (!isVoid) {
+           if (right.getName().equals(name)) {
+               right = llvmIrValue;
+           } else {
+               System.out.println("error when replace load");
+           }
+       }
     }
 }

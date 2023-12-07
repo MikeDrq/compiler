@@ -6,6 +6,8 @@ import Middle.Value.Instruction.Instruction;
 import Middle.Value.Instruction.InstructionType;
 import Mips.MipsInstruction.Li;
 
+import java.util.ArrayList;
+
 public class Calculate extends Instruction {
     private InstructionType instructionType;
     private LlvmIrValue left;
@@ -69,8 +71,28 @@ public class Calculate extends Instruction {
             s = s + left.getName() + ", " + right.getName() + "\n";
         } else {
             s = s + super.getName() + " = " + op + " ";
-            s = s + left.getType().midOutput() + " " + left.getName() + ", " + right.getName() + "\n";
+            s = s + " i32 " + left.getName() + ", " + right.getName() + "\n";
         }
         return s;
+    }
+
+    @Override
+    public ArrayList<LlvmIrValue> getOperand() {
+        ArrayList<LlvmIrValue> h = new ArrayList<>();
+        h.add(left);
+        h.add(right);
+        return h;
+    }
+
+    @Override
+    public void change(String name,LlvmIrValue llvmIrValue) {
+        if (left.getName().equals(name)) {
+            this.left = llvmIrValue;
+        }
+        if (right.getName().equals(name)) {
+            this.right = llvmIrValue;
+        }
+        System.out.println("-------------------------");
+        System.out.println(this.midOutput());
     }
 }

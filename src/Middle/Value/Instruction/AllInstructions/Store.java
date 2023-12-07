@@ -4,6 +4,8 @@ import Middle.LlvmIrValue;
 import Middle.Type.ValueType;
 import Middle.Value.Instruction.Instruction;
 
+import java.util.ArrayList;
+
 public class Store extends Instruction  {
     private LlvmIrValue leftValue;
     private LlvmIrValue rightValue;
@@ -28,5 +30,23 @@ public class Store extends Instruction  {
         s = s + "store " + leftValue.getType().midOutput() + " " + leftValue.getName() + ", " +
                 leftValue.getType().midOutput() + "* " + rightValue.getName() + "\n";
         return s;
+    }
+
+    @Override
+    public ArrayList<LlvmIrValue> getOperand() {
+        ArrayList<LlvmIrValue> h = new ArrayList<>();
+        h.add(leftValue);
+        h.add(rightValue);
+        return h;
+    }
+
+    @Override
+    public void change(String name,LlvmIrValue llvmIrValue) {
+        if (leftValue.getName().equals(name)) {
+            this.leftValue = llvmIrValue;
+        }
+        if (rightValue.getName().equals(name)) {
+            this.rightValue = llvmIrValue;
+        }
     }
 }

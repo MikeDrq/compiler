@@ -7,6 +7,7 @@ import Middle.Type.ValueType;
 import Middle.Value.Instruction.Instruction;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 public class Call extends Instruction {
     private ArrayList<LlvmIrValue> params;
@@ -122,5 +123,39 @@ public class Call extends Instruction {
             }
         }
         return sb.toString();
+    }
+
+    @Override
+    public ArrayList<LlvmIrValue> getOperand() {
+        ArrayList<LlvmIrValue> h = new ArrayList<>();
+        if (type == 0) {
+            if (params != null) {
+                for (LlvmIrValue l : params) {
+                    h.add(l);
+                }
+            }
+        } else if (type == 2) {
+            h.add(op);
+        }
+        return h;
+    }
+
+    @Override
+    public void change(String name,LlvmIrValue l) {
+        if (type == 0) {
+            ListIterator<LlvmIrValue> iterator = params.listIterator();
+            while (iterator.hasNext()) {
+                LlvmIrValue ll = iterator.next();
+                if (ll.getName().equals(name)) {
+                    iterator.set(l);
+                }
+            }
+        } else if (type == 2) {
+            if (op.getName().equals(name)) {
+                op = l;
+            } else {
+                System.out.println("should no get here");
+            }
+        }
     }
 }

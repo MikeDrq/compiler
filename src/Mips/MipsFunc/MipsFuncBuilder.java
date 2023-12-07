@@ -37,7 +37,7 @@ public class MipsFuncBuilder {
             MipsSymbol mipsSymbol = new MipsSymbol("%" + i,temp,param);
             temp = temp + 4;
             mipsSymbolTable.addMipsSymbol("%" + i,mipsSymbol);
-            System.out.println(param.getDim());
+            //System.out.println(param.getDim());
         }
     }
 

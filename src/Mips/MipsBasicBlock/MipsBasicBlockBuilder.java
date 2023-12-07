@@ -15,6 +15,7 @@ import Mips.GlobalLabelCnt;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class MipsBasicBlockBuilder {
     private BasicBlock basicBlock;
@@ -56,7 +57,7 @@ public class MipsBasicBlockBuilder {
     }
 
     public MipsBasicBlock generateMipsBasicBlock(ArrayList<String> strings) {
-        ArrayList<Instruction> instructions = basicBlock.getInstructions();
+        LinkedList<Instruction> instructions = basicBlock.getInstructions();
         for (int i = 0;i < instructions.size();i++) {
             Instruction instruction = instructions.get(i);
             if (instruction instanceof Alloca) { //填个符号表

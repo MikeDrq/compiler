@@ -4,6 +4,9 @@ import Middle.LlvmIrValue;
 import Middle.Type.ValueType;
 import Middle.Value.Instruction.Instruction;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 public class Br extends Instruction {
     private LlvmIrValue trueLabel;
     private LlvmIrValue falseLabel;
@@ -78,4 +81,21 @@ public class Br extends Instruction {
         return s;
     }
 
+    @Override
+    public ArrayList<LlvmIrValue> getOperand() {
+        ArrayList<LlvmIrValue> h = new ArrayList<>();
+        if (!jumpWithNoCondition) {
+            h.add(cond);
+        }
+        return h;
+    }
+
+    @Override
+    public void change(String name,LlvmIrValue llvmIrValue) {
+        if (cond.getName().equals(name)) {
+            this.cond = llvmIrValue;
+        }  else {
+            System.out.println("error when replace load");
+        }
+    }
 }

@@ -1,23 +1,27 @@
 package Middle.Value.BasicBlock;
 
+import Middle.LlvmIrModule;
 import Middle.LlvmIrValue;
+import Middle.Type.ArrayType;
+import Middle.Type.IntType;
+import Middle.Type.PointerType;
 import Middle.Type.ValueType;
-import Middle.Value.Instruction.AllInstructions.Br;
-import Middle.Value.Instruction.AllInstructions.Label;
+import Middle.Value.Instruction.AllInstructions.*;
 import Middle.Value.Instruction.Instruction;
 import SyntaxTree.DeclNode;
 import SyntaxTree.StmtNode;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class BasicBlock extends LlvmIrValue {
-    private ArrayList<Instruction> instructions;
+    private LinkedList<Instruction> instructions;
     private ArrayList<Br> continues = new ArrayList<>();
     private ArrayList<Br> breaks = new ArrayList<>();
+    private HashMap<String,LlvmIrValue> define = new HashMap<>();
 
     public BasicBlock(String name, ValueType valueType) {
         super(name,valueType);
-        instructions = new ArrayList<>();
+        instructions = new LinkedList<>();
     }
 
     public void addInstructions(ArrayList<Instruction> instructions) {
@@ -30,7 +34,7 @@ public class BasicBlock extends LlvmIrValue {
         this.instructions.add(instruction);
     }
 
-    public ArrayList<Instruction> getInstructions() {
+    public LinkedList<Instruction> getInstructions() {
         return instructions;
     }
 
@@ -64,7 +68,87 @@ public class BasicBlock extends LlvmIrValue {
                 s = s + instruction.midOutput();
             }
         }
-        System.out.println("block name:" + super.getName());
+        //System.out.println("block name:" + super.getName());
         return s;
+    }
+
+    //以下为优化部分
+    public HashMap<String,LlvmIrValue> getAndSetAllocaDefine() {
+        HashMap<String,LlvmIrValue> hm = new HashMap<>();
+        for(Instruction instruction : instructions) {
+            if (instruction instanceof Alloca) {
+                hm.put(instruction.getName(),instruction);
+            }
+        }
+        return hm;
+    }
+
+    public HashMap<String,LlvmIrValue> setStoreDefine(HashMap<String,LlvmIrValue> allAlloca) {
+        for (Instruction instruction : instructions) {
+            if (instruction instanceof Store) {
+                LlvmIrValue right = ((Store) instruction).getRightValue();
+                if (allAlloca.containsKey(right.getName())) {
+                    if (!define.containsKey(right.getName())) {
+                        define.put(right.getName(),right);
+                    }
+                }
+            }
+        }
+        return define;
+    }
+
+    public Boolean defineKey(String key) {
+        return define.containsKey(key);
+    }
+
+    public void insertPhi(Phi phi) {
+        this.instructions.add(1,phi);
+    }
+
+    public HashMap<String,Stack<LlvmIrValue>> rename(HashMap<String,Stack<LlvmIrValue>> alloca) {
+        Iterator<Instruction> iterator = instructions.iterator();
+        int cnt = 0;
+        while(iterator.hasNext()) {
+            Instruction instruction = iterator.next();
+            if (instruction instanceof Alloca) { //数组依然要用内存
+                if (instruction.getType() instanceof IntType || instruction.getType() instanceof PointerType) {
+                    Stack<LlvmIrValue> alloStack = new Stack<>();
+                    alloca.put(instruction.getName(),alloStack);
+                    iterator.remove();
+                    cnt--;
+                }
+            } else if (instruction instanceof Load) {
+                LlvmIrValue llvmIrValue = instruction.getOperand().get(0);
+                if (alloca.containsKey(llvmIrValue.getName())) {
+                    LlvmIrValue replace = alloca.get(llvmIrValue.getName()).peek();
+                    changeLoad(instruction.getName(), replace,cnt);
+                    iterator.remove();
+                    cnt--;
+                }
+            } else if (instruction instanceof  Store) {
+                Store is = (Store) instruction;
+                if (alloca.containsKey(is.getRightValue().getName())) {
+                    alloca.get(is.getRightValue().getName()).add(is.getLeftValue());
+                    iterator.remove();
+                    cnt--;
+                }
+            } else if (instruction instanceof Phi) {
+                alloca.get(instruction.getName()).add(instruction);
+            }
+            cnt++;
+        }
+        return alloca;
+    }
+
+    public void changeLoad(String name,LlvmIrValue replace,int cnt) {
+        for (int i = cnt + 1;i < instructions.size();i++) {
+            Instruction instruction = instructions.get(i);
+            ArrayList<LlvmIrValue> operands = instruction.getOperand();
+            for (LlvmIrValue l : operands) {
+                if (l.getName().equals(name)) {
+                    instruction.change(name, replace);
+                }
+            }
+        }
     }
 }
