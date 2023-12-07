@@ -133,6 +133,10 @@ public class BasicBlock extends LlvmIrValue {
                     cnt--;
                 }
             } else if (instruction instanceof Phi) {
+                System.out.println(instruction.getName());
+                for (String k : alloca.keySet()) {
+                    System.out.println(k);
+                }
                 alloca.get(instruction.getName()).add(instruction);
             }
             cnt++;

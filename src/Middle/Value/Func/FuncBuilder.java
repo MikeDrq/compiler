@@ -79,7 +79,7 @@ public class FuncBuilder {
         LlvmIrValue llvmIrValue = null;
         Symbol symbol = null;
         if (dim == 0) {
-            String name = "%" + cnt;
+            String name = "%v_" + cnt;
             llvmIrValue = new LlvmIrValue(name,new IntType(32));
             llvmIrValue.setIsParam(true);
             symbol = new Symbol(funcFParamNode.getToken(),SymbolType.VAR);
@@ -87,7 +87,7 @@ public class FuncBuilder {
             symbol.setLlvmIrValue(llvmIrValue);
         } else if (dim == 1) {
             //code_generation_2
-            String name = "%" + cnt;
+            String name = "%v_" + cnt;
             llvmIrValue = new LlvmIrValue(name,new PointerType(new ArrayType(1,-1,-1)));
             llvmIrValue.setIsParam(true);
             llvmIrValue.setDim(1);
@@ -96,7 +96,7 @@ public class FuncBuilder {
             symbol.setLlvmIrValue(llvmIrValue);
         } else if (dim == 2) {
             //code_generation_2
-            String name = "%" + cnt;
+            String name = "%v_" + cnt;
             int column = funcFParamNode.getConstExpNodes().get(0).calcuateValue(symbolTable);
             llvmIrValue = new LlvmIrValue(name,new PointerType(new ArrayType(2,-1,column)));
             llvmIrValue.setIsParam(true);

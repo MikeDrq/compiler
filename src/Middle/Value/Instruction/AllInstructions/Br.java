@@ -74,9 +74,9 @@ public class Br extends Instruction {
     public String midOutput() {
         String s = "";
         if (!jumpWithNoCondition) {
-            s = "br i1 " + cond.getName() + ",label %" + trueLabel.getName() + ",label %" + falseLabel.getName() + "\n";
+            s = "br i1 " + cond.getName() + ",label %label_" + trueLabel.getName() + ",label %label_" + falseLabel.getName() + "\n";
         } else {
-            s = "br label %" + jump.getName() + "\n";
+            s = "br label %label_" + jump.getName() + "\n";
         }
         return s;
     }

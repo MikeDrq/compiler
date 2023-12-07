@@ -10,6 +10,6 @@ public class Label extends Instruction {
     }
     @Override
     public String midOutput() {
-        return super.getName() + ":\n";
+        return "label_" + super.getName() + ":\n";
     }
 }

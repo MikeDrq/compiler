@@ -125,7 +125,7 @@ public class InstructionBuilder {
                 Symbol symbol = new Symbol(ident, SymbolType.CONST);
                 symbol.setDim(0);
                 symbolTable.addItem(symbol);
-                //String name = "%" + funcCnt.getCnt();
+                //String name = "%v_" + funcCnt.getCnt();
                 int num = constDefNode.getConstInitValNode().getConstExpNode().calcuateValue(symbolTable);
                 symbol.setInitial(num);
                 LlvmIrValue llvmIrValue = new LlvmIrValue(String.valueOf(num),new IntType(32));
@@ -140,7 +140,7 @@ public class InstructionBuilder {
                 symbolTable.addItem(symbol);
                 ArrayList<ConstExpNode> constExpNodes = constDefNode.getConstExpNodes();
                 int num = constExpNodes.get(0).calcuateValue(symbolTable);
-                String name = "%" + funcCnt.getCnt();
+                String name = "%v_" + funcCnt.getCnt();
                 LlvmIrValue llvmIrValue = new LlvmIrValue(name,new ArrayType(1,0,num));
                 llvmIrValue.setDim(1);
                 llvmIrValue.setColumn(num);
@@ -157,7 +157,7 @@ public class InstructionBuilder {
                 ArrayList<ConstExpNode> constExpNodes = constDefNode.getConstExpNodes();
                 int row = constExpNodes.get(0).calcuateValue(symbolTable);
                 int column = constExpNodes.get(1).calcuateValue(symbolTable);
-                String name = "%" + funcCnt.getCnt();
+                String name = "%v_" + funcCnt.getCnt();
                 LlvmIrValue llvmIrValue = new LlvmIrValue(name,new ArrayType(2,row,column));
                 llvmIrValue.setDim(2);
                 llvmIrValue.setRaw(row);
@@ -183,7 +183,7 @@ public class InstructionBuilder {
                 Symbol symbol = new Symbol(ident, SymbolType.VAR);
                 symbol.setDim(0);
                 symbolTable.addItem(symbol);
-                String name = "%" + funcCnt.getCnt();
+                String name = "%v_" + funcCnt.getCnt();
                 LlvmIrValue llvmIrValue = new LlvmIrValue(name,new IntType(32));
                 symbol.setLlvmIrValue(llvmIrValue);
                 Alloca alloca = new Alloca(new IntType(32),name,llvmIrValue);
@@ -196,7 +196,7 @@ public class InstructionBuilder {
                 Symbol symbol = new Symbol(ident,SymbolType.VAR_ARRAY1);
                 symbol.setDim(1);
                 symbolTable.addItem(symbol);
-                String name = "%" + funcCnt.getCnt();
+                String name = "%v_" + funcCnt.getCnt();
                 int column = varDefNode.getConstExpNodes().get(0).calcuateValue(symbolTable);
                 LlvmIrValue llvmIrValue = new LlvmIrValue(name,new ArrayType(1,0,column));
                 llvmIrValue.setDim(1);
@@ -213,7 +213,7 @@ public class InstructionBuilder {
                 Symbol symbol = new Symbol(ident,SymbolType.VAR_ARRAY1);
                 symbol.setDim(2);
                 symbolTable.addItem(symbol);
-                String name = "%" + funcCnt.getCnt();
+                String name = "%v_" + funcCnt.getCnt();
                 int row = varDefNode.getConstExpNodes().get(0).calcuateValue(symbolTable);
                 int column = varDefNode.getConstExpNodes().get(1).calcuateValue(symbolTable);
                 LlvmIrValue llvmIrValue = new LlvmIrValue(name,new ArrayType(2,row,column));
@@ -244,7 +244,7 @@ public class InstructionBuilder {
             ArrayList<ConstInitValNode> constInitValNodes = constInitValNode.getConstInitValNodes();
             int cnt = 0;
             for (ConstInitValNode civ : constInitValNodes) {
-                String name = "%" + funcCnt.getCnt();
+                String name = "%v_" + funcCnt.getCnt();
                 Getelementptr getelementptr = new Getelementptr(name,alloca.getType(),alloca,1,symbol.getArray_column(),cnt);
                 instructions.add(getelementptr);
                 LlvmIrValue llvmIrValue = dealAddExpNodes(civ.getConstExpNode().getAddExpNode());
@@ -261,7 +261,7 @@ public class InstructionBuilder {
                 ArrayList<ConstInitValNode> inCiv = civ.getConstInitValNodes();
                 int second = 0;
                 for (ConstInitValNode simple_civ : inCiv) {
-                    String name = "%" + funcCnt.getCnt();
+                    String name = "%v_" + funcCnt.getCnt();
                     Getelementptr getelementptr = new Getelementptr(name,alloca.getType(),
                             alloca,2,symbol.getArray_row(),symbol.getArray_column(),first,second);
                     instructions.add(getelementptr);
@@ -287,7 +287,7 @@ public class InstructionBuilder {
             ArrayList<InitValNode> initValNodes = initValNode.getInitValNodes();
             int cnt = 0;
             for (InitValNode ivn : initValNodes) {
-                String name = "%" + funcCnt.getCnt();
+                String name = "%v_" + funcCnt.getCnt();
                 Getelementptr getelementptr = new Getelementptr(name,alloca.getType(),alloca,1,symbol.getArray_column(),cnt);
                 instructions.add(getelementptr);
                 LlvmIrValue llvmIrValue =  dealExpNode(ivn.getExpNode());
@@ -303,7 +303,7 @@ public class InstructionBuilder {
                 int column = 0;
                 ArrayList<InitValNode> iivns = ivn.getInitValNodes();
                 for (InitValNode iivn : iivns) {
-                    String name = "%" + funcCnt.getCnt();
+                    String name = "%v_" + funcCnt.getCnt();
                     Getelementptr getelementptr = new Getelementptr(name,alloca.getType(),alloca,2,symbol.getArray_row(),symbol.getArray_column(),row,column);
                     instructions.add(getelementptr);
                     LlvmIrValue llvmIrValue = dealExpNode(iivn.getExpNode());
@@ -339,7 +339,7 @@ public class InstructionBuilder {
                 System.out.println("error");
             }
             LlvmIrValue rightValue = dealMulExpNodes(mulExpNodes.get(i+1));
-            String name = "%" + funcCnt.getCnt();
+            String name = "%v_" + funcCnt.getCnt();
             Calculate calculate = new Calculate(name,leftValue,rightValue,instructionType,new IntType(32));
             instructions.add(calculate);
             leftValue = calculate;
@@ -361,7 +361,7 @@ public class InstructionBuilder {
                 instructionType = InstructionType.srem;
             }
             LlvmIrValue rightValue = dealUnaryExpNode(unaryExpNodes.get(i+1));
-            String name = "%" + funcCnt.getCnt();
+            String name = "%v_" + funcCnt.getCnt();
             Calculate calculate = new Calculate(name,leftValue,rightValue,instructionType,new IntType(32));
             instructions.add(calculate);
             leftValue = calculate;
@@ -380,7 +380,7 @@ public class InstructionBuilder {
             if(op.getTokenType() == TokenType.PLUS) {
                 return llvmIrValue; //+可省略
             } else if (op.getTokenType() == TokenType.MINU) {
-                String name = "%" + funcCnt.getCnt();
+                String name = "%v_" + funcCnt.getCnt();
                 InstructionType instructionType = InstructionType.sub;
                 Calculate calculate = new Calculate(name,new LlvmIrValue("0",new IntType(32)),
                         llvmIrValue,instructionType,new IntType(32));
@@ -388,7 +388,7 @@ public class InstructionBuilder {
                 return calculate;
             } else if (op.getTokenType() == TokenType.NOT) {
                 //code_generation_2
-                String name = "%" + funcCnt.getCnt();
+                String name = "%v_" + funcCnt.getCnt();
                 InstructionType instructionType = InstructionType.xor;
                 /*Calculate calculate = new Calculate(name,new LlvmIrValue("-1",new IntType(32)),
                         llvmIrValue,instructionType,new IntType(32));*/
@@ -396,7 +396,7 @@ public class InstructionBuilder {
                 Calculate calculate = new Calculate(name,llvmIrValue,new LlvmIrValue("0",new IntType(32)),
                         InstructionType.icmp,new IntType(1),cond);
                 instructions.add(calculate);
-                name = "%" + funcCnt.getCnt();
+                name = "%v_" + funcCnt.getCnt();
                 Zext zext = new Zext(name,null,calculate);
                 instructions.add(zext);
                 return zext;
@@ -419,7 +419,7 @@ public class InstructionBuilder {
             if (llvmIrValue.isParam()) {
                 return llvmIrValue;
             }
-            String name = "%" + funcCnt.getCnt();
+            String name = "%v_" + funcCnt.getCnt();
             Load load = new Load(name,new IntType(32),llvmIrValue);
             this.instructions.add(load);
             return load;
@@ -430,7 +430,7 @@ public class InstructionBuilder {
                 if (llvmIrValue.getType() instanceof PointerType) {
                     llvmIrValue = loadArray(llvmIrValue);
                 }
-                String name_offset = "%" + funcCnt.getCnt();
+                String name_offset = "%v_" + funcCnt.getCnt();
                 Getelementptr getelementptr = new Getelementptr(name_offset, llvmIrValue.getType(), llvmIrValue, 1, c,0);
                 instructions.add(getelementptr);
                 getelementptr.setRParamDim(1);
@@ -444,10 +444,10 @@ public class InstructionBuilder {
                     }
                     ExpNode expNode = lValNode.getExpNodes().get(0);
                     LlvmIrValue posValue = dealExpNode(expNode);
-                    String name_offset = "%" + funcCnt.getCnt();
+                    String name_offset = "%v_" + funcCnt.getCnt();
                     Getelementptr getelementptr = new Getelementptr(name_offset, llvmIrValue.getType(), llvmIrValue, 1, c, posValue);
                     instructions.add(getelementptr);
-                    String name = "%" + funcCnt.getCnt();
+                    String name = "%v_" + funcCnt.getCnt();
                     Load load = new Load(name, new IntType(32), getelementptr);
                     instructions.add(load);
                     load.setRParamDim(0);
@@ -463,7 +463,7 @@ public class InstructionBuilder {
                 if (llvmIrValue.getType() instanceof PointerType) {
                     llvmIrValue = loadArray(llvmIrValue);
                 }
-                String name_offset = "%" + funcCnt.getCnt();
+                String name_offset = "%v_" + funcCnt.getCnt();
                 Getelementptr getelementptr = new Getelementptr(name_offset,llvmIrValue.getType(), llvmIrValue,
                         2, r, c, 0,0);
                 instructions.add(getelementptr);
@@ -475,7 +475,7 @@ public class InstructionBuilder {
                 }
                 ExpNode expNode1 = lValNode.getExpNodes().get(0);
                 LlvmIrValue pos1 = dealExpNode(expNode1);
-                String name_offset = "%" + funcCnt.getCnt();
+                String name_offset = "%v_" + funcCnt.getCnt();
                 Getelementptr getelementptr = new Getelementptr(name_offset, llvmIrValue.getType(), llvmIrValue,
                         2, r, c, pos1, new LlvmIrValue("0",new IntType(32)));
                 instructions.add(getelementptr);
@@ -492,11 +492,11 @@ public class InstructionBuilder {
                     ExpNode expNode2 = lValNode.getExpNodes().get(1);
                     LlvmIrValue pos1 = dealExpNode(expNode1);
                     LlvmIrValue pos2 = dealExpNode(expNode2);
-                    String name_offset = "%" + funcCnt.getCnt();
+                    String name_offset = "%v_" + funcCnt.getCnt();
                     Getelementptr getelementptr = new Getelementptr(name_offset, llvmIrValue.getType(), llvmIrValue,
                             2, r, c, pos1, pos2);
                     instructions.add(getelementptr);
-                    String name = "%" + funcCnt.getCnt();
+                    String name = "%v_" + funcCnt.getCnt();
                     Load load = new Load(name, new IntType(32), getelementptr);
                     instructions.add(load);
                     load.setRParamDim(0);
@@ -536,7 +536,7 @@ public class InstructionBuilder {
         String name = "";
         FuncType funcType = (FuncType) llvmIrValue.getType();
         if (funcType.getRetType() instanceof IntType) {
-            name = "%" + funcCnt.getCnt();
+            name = "%v_" + funcCnt.getCnt();
         }
         Call call = new Call(name,llvmIrValue.getType(),values,llvmIrValue);
         instructions.add(call);
@@ -559,7 +559,7 @@ public class InstructionBuilder {
             if (llvmIrValue.getType() instanceof PointerType) {
                 llvmIrValue = loadArray(llvmIrValue);
             }
-            String name = "%" + funcCnt.getCnt();
+            String name = "%v_" + funcCnt.getCnt();
             Getelementptr getelementptr = new Getelementptr(name,llvmIrValue.getType(),llvmIrValue,dim,symbol.getArray_column(),pos);
             instructions.add(getelementptr);
             Store store = new Store("store",null,left,getelementptr);
@@ -572,7 +572,7 @@ public class InstructionBuilder {
             if (llvmIrValue.getType() instanceof PointerType) {
                 llvmIrValue = loadArray(llvmIrValue);
             }
-            String name = "%" + funcCnt.getCnt();
+            String name = "%v_" + funcCnt.getCnt();
             Getelementptr getelementptr = new Getelementptr(name,llvmIrValue.getType(),llvmIrValue,dim,symbol.getArray_row(),symbol.getArray_column(),row,column);
             instructions.add(getelementptr);
             Store store = new Store("store",null,left,getelementptr);
@@ -583,7 +583,7 @@ public class InstructionBuilder {
     }
 
     public LlvmIrValue loadArray(LlvmIrValue llvmIrValue) {
-        String name = "%" + funcCnt.getCnt();
+        String name = "%v_" + funcCnt.getCnt();
         Load load = new Load(name,llvmIrValue.getType(),llvmIrValue);
         instructions.add(load);
         return load;
@@ -610,7 +610,7 @@ public class InstructionBuilder {
         LlvmIrValue llvmIrValue = symbol.getLlvmIrValue();
         int dim = symbol.getDim();
         if (dim == 0) {
-            String name = "%" + funcCnt.getCnt();
+            String name = "%v_" + funcCnt.getCnt();
             Call call = new Call(name,new IntType(32),"@getint");
             instructions.add(call);
             Store store = new Store("store",null,call,llvmIrValue);
@@ -621,10 +621,10 @@ public class InstructionBuilder {
             if (llvmIrValue.getType() instanceof PointerType) {
                 llvmIrValue = loadArray(llvmIrValue);
             }
-            String name_pos = "%" + funcCnt.getCnt();
+            String name_pos = "%v_" + funcCnt.getCnt();
             Getelementptr getelementptr = new Getelementptr(name_pos,llvmIrValue.getType(),llvmIrValue,dim,symbol.getArray_column(),pos);
             instructions.add(getelementptr);
-            String name = "%" + funcCnt.getCnt();
+            String name = "%v_" + funcCnt.getCnt();
             Call call = new Call(name,new IntType(32),"@getint");
             instructions.add(call);
             Store store = new Store("store",null,call,getelementptr);
@@ -636,10 +636,10 @@ public class InstructionBuilder {
             if (llvmIrValue.getType() instanceof PointerType) {
                 llvmIrValue = loadArray(llvmIrValue);
             }
-            String name_pos = "%" + funcCnt.getCnt();
+            String name_pos = "%v_" + funcCnt.getCnt();
             Getelementptr getelementptr = new Getelementptr(name_pos,llvmIrValue.getType(),llvmIrValue,dim,symbol.getArray_row(),symbol.getArray_column(),row,column);
             instructions.add(getelementptr);
-            String name_call = "%" + funcCnt.getCnt();
+            String name_call = "%v_" + funcCnt.getCnt();
             Call call = new Call(name_call,new IntType(32),"@getint");
             instructions.add(call);
             Store store = new Store("store",null,call,getelementptr);

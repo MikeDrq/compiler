@@ -153,7 +153,7 @@ public class BasicBlockBuilder {
     public void dealParams(BasicBlock basicBlock,ArrayList<Symbol> params,SymbolTable symbolTable) {
         ArrayList<Instruction> instructions = new ArrayList<>();
         for (Symbol symbol : params) {
-            String name = "%" + funcCnt.getCnt();
+            String name = "%v_" + funcCnt.getCnt();
             LlvmIrValue llvmIrValue = symbolTable.getVarByName(symbol.getName()).getLlvmIrValue();
             Alloca alloca = new Alloca(llvmIrValue.getType(),name,llvmIrValue);
             instructions.add(alloca);
@@ -325,12 +325,12 @@ public class BasicBlockBuilder {
         ArrayList<Token> op = lAndExpNode.getOp();
         //计算值，并且存入语句块
         LlvmIrValue cond = dealEqExp(bb,expNodes.get(0),symbolTable);
-        String cmp_name = "%" + funcCnt.getCnt();
+        String cmp_name = "%v_" + funcCnt.getCnt();
         String key = "ne";
         Calculate calculate = new Calculate(cmp_name, cond, new LlvmIrValue("0",new IntType(32)), InstructionType.icmp, new IntType(1), key);
         bb.addOneInstruction(calculate);
         //生成跳转，存入语句块
-        //String name_br = "%" + funcCnt.getCnt();
+        //String name_br = "%v_" + funcCnt.getCnt();
         Br br = new Br("br", null, calculate);
         bb.addOneInstruction(br);
         //对于 && 两侧的每一个式子进行类似操作
@@ -346,10 +346,10 @@ public class BasicBlockBuilder {
             brNeedFalseValue.add(br);
 
             cond = dealEqExp(bsb, expNodes.get(i + 1), symbolTable);
-            cmp_name = "%" + funcCnt.getCnt();
+            cmp_name = "%v_" + funcCnt.getCnt();
             calculate = new Calculate(cmp_name, cond, new LlvmIrValue("0", new IntType(32)), InstructionType.icmp, new IntType(1), key);
             bsb.addOneInstruction(calculate);
-            //name_br = "%" + funcCnt.getCnt();
+            //name_br = "%v_" + funcCnt.getCnt();
             br = new Br("br", null, calculate);
             bsb.addOneInstruction(br);
         }
@@ -374,10 +374,10 @@ public class BasicBlockBuilder {
                 } else {
                     key = "ne";
                 }
-                String name = "%" + funcCnt.getCnt();
+                String name = "%v_" + funcCnt.getCnt();
                 Calculate calculate = new Calculate(name, left, right, InstructionType.icmp, new IntType(1), key);
                 bb.addOneInstruction(calculate);
-                name = "%" + funcCnt.getCnt();
+                name = "%v_" + funcCnt.getCnt();
                 zext = new Zext(name,null,calculate);
                 bb.addOneInstruction(zext);
                 left = zext;
@@ -409,22 +409,22 @@ public class BasicBlockBuilder {
                 } else if (op.get(i).getTokenType() == TokenType.GEQ) {
                     bond = "sge";
                 }
-                String name = "%" + funcCnt.getCnt();
+                String name = "%v_" + funcCnt.getCnt();
                 Calculate calculate = new Calculate(name, left, right, InstructionType.icmp, new IntType(1), bond);
                 bb.addOneInstruction(calculate);
-                name = "%" + funcCnt.getCnt();
+                name = "%v_" + funcCnt.getCnt();
                 zext = new Zext(name,null,calculate);
                 bb.addOneInstruction(zext);
                 left = zext;
             }
             return zext;
         } else {
-            /*String name = "%" + funcCnt.getCnt();
+            /*String name = "%v_" + funcCnt.getCnt();
             String bond = "sgt"; //只有一个数字，跟 0 比
             Calculate calculate = new Calculate(name,left,new LlvmIrValue("0",new IntType(32)),
                     InstructionType.icmp, new IntType(1), bond);
             bb.addOneInstruction(calculate);
-            name = "%" + funcCnt.getCnt();
+            name = "%v_" + funcCnt.getCnt();
             Zext zext = new Zext(name,null,calculate);
             bb.addOneInstruction(zext);*/
             return left;

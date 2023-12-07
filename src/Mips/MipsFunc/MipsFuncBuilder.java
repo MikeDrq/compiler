@@ -34,9 +34,9 @@ public class MipsFuncBuilder {
         int temp = 8; //第一个参数，4 是 $ra，0 是当前函数的起始位置。
         for (int i = 0;i < params.size();i++) {
             LlvmIrValue param = params.get(i);
-            MipsSymbol mipsSymbol = new MipsSymbol("%" + i,temp,param);
+            MipsSymbol mipsSymbol = new MipsSymbol("%v_" + i,temp,param);
             temp = temp + 4;
-            mipsSymbolTable.addMipsSymbol("%" + i,mipsSymbol);
+            mipsSymbolTable.addMipsSymbol("%v_" + i,mipsSymbol);
             //System.out.println(param.getDim());
         }
     }
