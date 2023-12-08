@@ -19,9 +19,11 @@ import java.util.Iterator;
 
 public class BasicBlockBuilder {
     private FuncCnt funcCnt;
+    private BasicBlockCnt basicBlockCnt;
 
-    public BasicBlockBuilder (FuncCnt funcCnt) {
+    public BasicBlockBuilder (FuncCnt funcCnt,BasicBlockCnt basicBlockCnt) {
         this.funcCnt = funcCnt;
+        this.basicBlockCnt = basicBlockCnt;
     }
 
     public boolean check(BlockItemNode blockItemNode) {
@@ -187,7 +189,7 @@ public class BasicBlockBuilder {
 
         dealCondNode(basicBlock,condNode,symbolTable,bbs,brNeedTrueValue,brNeedFalseValue);
         //此时，bbs里面是所有条件判断产生的块，两个br都是未填值的br,true 的都是进if 的，false都是进if后的
-        int num = funcCnt.getCnt();
+        int num = basicBlockCnt.getCnt();
         BasicBlock bb = new BasicBlock(String.valueOf(num),new LabelType(num));
         Label label = new Label(String.valueOf(num),new LabelType(num));
         bb.addOneInstruction(label);
@@ -219,7 +221,7 @@ public class BasicBlockBuilder {
         bbs.get(bbs.size() - 1).addOneInstruction(ifBr);
         Br elseBr = null;
         if (stmtNode_else != null) {
-            num = funcCnt.getCnt();
+            num = basicBlockCnt.getCnt();
             bb = new BasicBlock(String.valueOf(num),new LabelType(num));
             label = new Label(String.valueOf(num),new LabelType(num));
             bb.addOneInstruction(label);
@@ -247,7 +249,7 @@ public class BasicBlockBuilder {
             elseBr = new Br(String.valueOf("br"),new LabelType(num));
             bbs.get(bbs.size()-1).addOneInstruction(elseBr);
         }
-        num = funcCnt.getCnt(); //新建一个块
+        num = basicBlockCnt.getCnt(); //新建一个块
         bb = new BasicBlock(String.valueOf(num),new LabelType(num));
         label = new Label(String.valueOf(num),new LabelType(num));
         bb.addOneInstruction(label);
@@ -275,7 +277,7 @@ public class BasicBlockBuilder {
         }
         for (int i = 0;i < op.size();i++) {
             //需要新建一个块，作为引物
-            int num = funcCnt.getCnt();
+            int num = basicBlockCnt.getCnt();
             BasicBlock bsb = new BasicBlock(String.valueOf(num), new LabelType(num));
             bbs.add(bsb);
             Label label = new Label(String.valueOf(num), new LabelType(num));
@@ -336,7 +338,7 @@ public class BasicBlockBuilder {
         //对于 && 两侧的每一个式子进行类似操作
         for (int i = 0; i < op.size(); i++) {
             //新建语句块
-            int num = funcCnt.getCnt();
+            int num = basicBlockCnt.getCnt();
             BasicBlock bsb = new BasicBlock(String.valueOf(num), new LabelType(num));
             bbs.add(bsb);
             Label label = new Label(String.valueOf(num), new LabelType(num));
@@ -445,7 +447,7 @@ public class BasicBlockBuilder {
         basicBlock.addOneInstruction(br);
         ArrayList<Br> brNeedTrueValue = new ArrayList<>(); //需要为真跳转的
         ArrayList<Br> brNeedFalseValue = new ArrayList<>();
-        int num = funcCnt.getCnt(); //cond 块
+        int num = basicBlockCnt.getCnt(); //cond 块
         BasicBlock block = new BasicBlock(String.valueOf(num),new LabelType(num));
         Label label = new Label(String.valueOf(num),new LabelType(num));
         block.addOneInstruction(label);
@@ -458,7 +460,7 @@ public class BasicBlockBuilder {
         BasicBlock for_body;
         if (condNode != null) {
             dealCondNode(block,condNode,newSymbolTable,basicBlocks,brNeedTrueValue,brNeedFalseValue);
-            num = funcCnt.getCnt(); //for循环主体块的第一个块,从这里开始可能有break，continue
+            num = basicBlockCnt.getCnt(); //for循环主体块的第一个块,从这里开始可能有break，continue
             for_body = new BasicBlock(String.valueOf(num),new LabelType(num));
             basicBlocks.add(for_body);
             label = new Label(String.valueOf(num),new LabelType(num));
@@ -483,7 +485,7 @@ public class BasicBlockBuilder {
         }
         br = new Br("br",null);
         basicBlocks.get(basicBlocks.size() - 1).addOneInstruction(br);
-        num = funcCnt.getCnt();
+        num = basicBlockCnt.getCnt();
         BasicBlock last_for = new BasicBlock(String.valueOf(num),new LabelType(num));
         label = new Label(String.valueOf(num),new LabelType(num));
         last_for.addOneInstruction(label);
@@ -496,7 +498,7 @@ public class BasicBlockBuilder {
         br = new Br("br",null);
         br.setJump(block);
         last_for.addOneInstruction(br);
-        num = funcCnt.getCnt();
+        num = basicBlockCnt.getCnt();
         BasicBlock nextBlock = new BasicBlock(String.valueOf(num),new LabelType(num));
         label = new Label(String.valueOf(num),new LabelType(num));
         nextBlock.addOneInstruction(label);

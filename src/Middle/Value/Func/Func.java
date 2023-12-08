@@ -26,9 +26,13 @@ public class Func extends LlvmIrValue {
     private HashMap<String,LlvmIrValue> allStore = new HashMap<>();
     private HashMap<String, HashSet<String>> domainFrontier = new HashMap<>(); //支配边界
     private HashMap<String,Stack<LlvmIrValue>> alloca = new HashMap<>();
+    private HashMap<String,Boolean> isArrive = new HashMap<>();
+    private ArrayList<Instruction> allPhi = new ArrayList<>();
+    private int phiCnt;
     public Func(String name,ValueType valueType) {
         super(name,valueType);
         params = ((FuncType) super.getType()).getParams();
+        phiCnt = 0;
     }
 
     public void addBasicBlocks(ArrayList<BasicBlock> basicBlocks) {
@@ -82,7 +86,7 @@ public class Func extends LlvmIrValue {
     }
 
     /*以下为优化部分*/
-    public void calculateDomain() { //构建支配关系
+    /*public void calculateDomain() { //构建支配关系
         // 初始化
         for (BasicBlock basicBlock : basicBlocks) {
             HashSet<String> t = new HashSet<>();
@@ -144,7 +148,7 @@ public class Func extends LlvmIrValue {
                 }
             } else {
                 for (String s : domains) {
-                    iDom.put(key,s);
+                    iDom.put(key, s);
                 }
             }
         }
@@ -163,14 +167,41 @@ public class Func extends LlvmIrValue {
                     } else {
                         domainFrontier.get(temp).add(s);
                     }
-                    temp = iDom.get(temp);
+                    if (iDom.containsKey(temp) && !iDom.get(temp).equals(temp)) {
+                        temp = iDom.get(temp);
+                    } else {
+                        break;
+                    }
                 }
             }
         }
     }
 
+    public void dfs(String cur) {
+        if (isArrive.get(cur)) {
+            return;
+        }
+        isArrive.put(cur,true);
+        if (!next.containsKey(cur)) {
+            return;
+        }
+        ArrayList<String> nexts = next.get(cur);
+
+        for (String s : nexts) {
+            if (prev.containsKey(s)) {
+                prev.get(s).add(cur);
+            } else {
+                ArrayList<String> t = new ArrayList<>();
+                t.add(cur);
+                prev.put(s, t);
+            }
+            dfs(s);
+        }
+    }
+
     public void buildCFG() {
         for (BasicBlock basicBlock : basicBlocks) {
+            isArrive.put(basicBlock.getName(),false);
             LinkedList<Instruction> instructions = basicBlock.getInstructions();
             for (Instruction instruction : instructions) {
                 if (instruction instanceof Br) {
@@ -180,34 +211,33 @@ public class Func extends LlvmIrValue {
                         String num = br.getJumpName();
                         t.add(num);
                         next.put(basicBlock.getName(),t);
-                        if (prev.containsKey(num)) {
-                            prev.get(num).add(basicBlock.getName());
-                        } else {
-                            t = new ArrayList<>();
-                            t.add(basicBlock.getName());
-                            prev.put(num,t);
-                        }
                     } else {
                         t.add(br.getTrueLabel().getName());
                         t.add(br.getFalseLabel().getName());
                         next.put(basicBlock.getName(),t);
-                        if (prev.containsKey(br.getTrueLabel().getName())) {
-                            prev.get(br.getTrueLabel().getName()).add(basicBlock.getName());
-                        } else {
-                            t = new ArrayList<>();
-                            t.add(basicBlock.getName());
-                            prev.put(br.getTrueLabel().getName(),t);
-                        }
-                        if (prev.containsKey(br.getFalseLabel().getName())) {
-                            prev.get(br.getFalseLabel().getName()).add(basicBlock.getName());
-                        } else {
-                            t = new ArrayList<>();
-                            t.add(basicBlock.getName());
-                            prev.put(br.getFalseLabel().getName(),t);
-                        }
                     }
                     break;
                 }
+            }
+        }
+
+        String first = basicBlocks.get(0).getName();//第一个块的名字
+        ArrayList<String> t = new ArrayList<>();
+        t.add(first);
+        prev.put(first,t);
+        dfs(first);
+        Iterator<String> iterator = next.keySet().iterator();
+        while(iterator.hasNext()) {
+            String key = iterator.next();
+            if (!isArrive.get(key)) {
+                iterator.remove();
+            }
+        }
+        Iterator<BasicBlock> bi = basicBlocks.iterator();
+        while(bi.hasNext()) {
+            String name = bi.next().getName();
+            if (!isArrive.get(name)) {
+                bi.remove();
             }
         }
     }
@@ -236,6 +266,15 @@ public class Func extends LlvmIrValue {
         return allStore;
     }
 
+    public Boolean isContainBb(ArrayList<BasicBlock> defines,BasicBlock bb) {
+        for (BasicBlock b : defines) {
+            if (b.getName().equals(bb.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void insertPhi() {
         for (String key : allStore.keySet()) {
             HashMap<String,BasicBlock> inserts = new HashMap<>(); //插入phi的block
@@ -245,7 +284,6 @@ public class Func extends LlvmIrValue {
                     defines.add(basicBlock);
                 }
             }
-
             ListIterator<BasicBlock> iterator = defines.listIterator();
             while(iterator.hasNext()) {
                 BasicBlock b = iterator.next(); //X块
@@ -254,11 +292,12 @@ public class Func extends LlvmIrValue {
                     HashSet<String> bn = domainFrontier.get(b.getName()); //Y块
                     for (String s : bn) {
                         if (!inserts.containsKey(s)) {
-                            Phi phi = new Phi(key, new PhiType());
+                            Phi phi = new Phi( key, new PhiType(),"%p_"+phiCnt);
+                            phiCnt++;
                             BasicBlock bb = findBasicBlock(s);
                             bb.insertPhi(phi);
                             inserts.put(s,bb);
-                            if (!defines.contains(s)) {
+                            if (!isContainBb(defines,bb)) {
                                 iterator.add(bb);
                             }
                         }
@@ -293,12 +332,26 @@ public class Func extends LlvmIrValue {
 
     public void doWalk(String cur,HashMap<String,ArrayList<String>> tree) {
         BasicBlock bb = findBasicBlock(cur);
+        if (cur.equals("57")) {
+            System.out.println("gggod");
+        }
         rename(bb);
+        if (next.containsKey(cur)) {
+            if (cur.equals("29")) {
+                System.out.println("hhhh");
+            }
+            for(String s : next.get(cur)) {
+                BasicBlock cb = findBasicBlock(s);
+                allPhi.addAll(cb.fillPhi(alloca,bb));
+            }
+        }
         if (tree.containsKey(cur)) {
+
             for (String s : tree.get(cur)) {
                 doWalk(s, tree);
             }
         }
+
     }
 
     public void walkTree(String init,HashMap<String,ArrayList<String>> tree) {
@@ -333,11 +386,14 @@ public class Func extends LlvmIrValue {
         HashMap<String,ArrayList<String>> tree = new HashMap<>();
         String init = buildDomainTree(tree);
         walkTree(init,tree);
+        for (Instruction instruction : allPhi) {  //phi重命名
+           instruction.changeName(((Phi) instruction).getChangeName());
+        }
     }
 
     public String domainOutput() {
         String s = "\n";
-        /*for (String key : next.keySet()) {
+        for (String key : next.keySet()) {
             if (next.get(key).size() == 1) {
                 s = s + key + " next " + next.get(key).get(0) + "\n";
             } else if (next.get(key).size() == 2) {
@@ -352,7 +408,8 @@ public class Func extends LlvmIrValue {
             }
             s = s + "\n";
         }*/
-        /*s = s + "domain:\n";
+        /*
+        s = s + "domain:\n";
         for (String key : basicDomain.keySet()) {
             s = s + key + "dominated by: ";
             for (String t : basicDomain.get(key)) {
@@ -366,7 +423,7 @@ public class Func extends LlvmIrValue {
             s = s + key + "strict domains: " + iDom.get(key);
             s = s + "\n";
         }
-        s = s + "\n";*/
+        s = s + "\n";
         s = s + "frontier:\n";
         for (String key : domainFrontier.keySet()) {
             s = s + key + "frontiers :";
@@ -377,5 +434,5 @@ public class Func extends LlvmIrValue {
         }
         s = s + "\n";
         return s;
-    }
+    }*/
 }

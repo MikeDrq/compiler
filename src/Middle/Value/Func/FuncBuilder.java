@@ -6,6 +6,8 @@ import Middle.LlvmIrValue;
 import Middle.Type.*;
 import Middle.Value.BasicBlock.BasicBlock;
 import Middle.Value.BasicBlock.BasicBlockBuilder;
+import Middle.Value.BasicBlock.BasicBlockCnt;
+import Middle.Value.Instruction.AllInstructions.Label;
 import Middle.Value.Instruction.AllInstructions.Ret;
 import SymbolTable.SymbolTable;
 import SyntaxTree.FuncDefNode;
@@ -24,14 +26,18 @@ public class FuncBuilder {
 
     private MainFuncDefNode mainFuncDefNode;
 
-    public FuncBuilder (FuncDefNode funcDefNode, SymbolTable symbolTable) {
+    private BasicBlockCnt basicBlockCnt;
+
+    public FuncBuilder (FuncDefNode funcDefNode, SymbolTable symbolTable, BasicBlockCnt basicBlockCnt) {
         this.funcDefNode = funcDefNode;
         this.symbolTable = symbolTable;
+        this.basicBlockCnt = basicBlockCnt;
     }
 
-    public FuncBuilder(MainFuncDefNode mainFuncDefNode,SymbolTable symbolTable) {
+    public FuncBuilder(MainFuncDefNode mainFuncDefNode,SymbolTable symbolTable,BasicBlockCnt basicBlockCnt) {
         this.mainFuncDefNode = mainFuncDefNode;
         this.symbolTable = symbolTable;
+        this.basicBlockCnt = basicBlockCnt;
     }
 
     public Func generateFunc() {
@@ -61,9 +67,10 @@ public class FuncBuilder {
         type = new FuncType(ret,paramsLlvmIrType);
         Func func = new Func("@"+funcDefNode.getIdent().getToken(),type);
         symbol.setLlvmIrValue(func);
-        BasicBlockBuilder basicBlockBuilder = new BasicBlockBuilder(funcCnt);
-        int num = funcCnt.getCnt(); //第一个语句块
+        BasicBlockBuilder basicBlockBuilder = new BasicBlockBuilder(funcCnt,basicBlockCnt);
+        int num = basicBlockCnt.getCnt(); //第一个语句块
         BasicBlock basicBlock = new BasicBlock(String.valueOf(num),new LabelType(num));
+        basicBlock.addOneInstruction(new Label(String.valueOf(num),new LabelType(num)));
         ArrayList<BasicBlock> tbs = basicBlockBuilder.generateInitBasicBlocks(funcDefNode.getBlockNode(),symbol,basicBlock,temp);
         if (symbol.getRetype() == 0) {
             BasicBlock bb = tbs.get(tbs.size()-1);
@@ -127,9 +134,10 @@ public class FuncBuilder {
         symbol.setLlvmIrValue(func);
         symbolTable.addItem(symbol);
         createNewTable();
-        BasicBlockBuilder basicBlockBuilder = new BasicBlockBuilder(funcCnt);
-        int num = funcCnt.getCnt();
+        BasicBlockBuilder basicBlockBuilder = new BasicBlockBuilder(funcCnt,basicBlockCnt);
+        int num = basicBlockCnt.getCnt();
         BasicBlock basicBlock = new BasicBlock(String.valueOf(num),new LabelType(num));
+        basicBlock.addOneInstruction(new Label(String.valueOf(num),new LabelType(num)));
         func.addBasicBlocks(basicBlockBuilder.generateInitBasicBlocks(mainFuncDefNode.getBlockNode(),symbol,basicBlock,symbolTable));
         symbolTable = symbolTable.getParent();
         return func;

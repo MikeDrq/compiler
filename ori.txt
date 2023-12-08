@@ -108,7 +108,7 @@ br i1 %v_14,label %label_16,label %label_17
 label_16:
 br label %label_17
 label_17:
-%p_1=phi i32 [ 0 , %label_15 ], [ 1 , %label_16 ]
+%p_0=phi i32 [ 0 , %label_15 ], [ 1 , %label_16 ]
 br label %label_18
 label_18:
 %v_17 = icmp slt i32 0, %v_0
@@ -116,8 +116,8 @@ label_18:
 %v_19 = icmp ne i32 %v_18, 0
 br i1 %v_19,label %label_19,label %label_24
 label_19:
-%v_23 = add  i32 %p_1, 0
-%v_24 = icmp eq i32 0, %v_23
+%v_23 = add  i32 %p_0, 0
+%v_24 = icmp eq i32 %v_47, %v_23
 %v_25 = zext i1 %v_24 to i32
 %v_26 = icmp ne i32 %v_25, 0
 br i1 %v_26,label %label_20,label %label_21
@@ -130,29 +130,29 @@ br label %label_18
 label_24:
 br label %label_25
 label_25:
-%p_3=phi i32 [ 0 , %label_24 ], [ %v_47 , %label_30 ]
+%p_2=phi i32 [ 0 , %label_24 ], [ %v_47 , %label_30 ]
 %v_31 = icmp eq i32 %v_0, 0
 %v_32 = zext i1 %v_31 to i32
-%v_33 = icmp slt i32 %p_3, %v_32
+%v_33 = icmp slt i32 %p_2, %v_32
 %v_34 = zext i1 %v_33 to i32
 %v_35 = icmp ne i32 %v_34, 0
 br i1 %v_35,label %label_27,label %label_26
 label_26:
-%v_37 = icmp sge i32 %p_3, 0
+%v_37 = icmp sge i32 %p_2, 0
 %v_38 = zext i1 %v_37 to i32
 %v_39 = icmp ne i32 %v_38, 0
 br i1 %v_39,label %label_27,label %label_31
 label_27:
-%v_41 = icmp ne i32 %p_3, 0
+%v_41 = icmp ne i32 %p_2, 0
 %v_42 = zext i1 %v_41 to i32
 %v_43 = icmp ne i32 %v_42, 0
 br i1 %v_43,label %label_28,label %label_29
 label_28:
-%v_45 = sub  i32 %p_3, 2
+%v_45 = sub  i32 %p_2, 2
 br label %label_29
 label_29:
-%p_2=phi i32 [ %p_3 , %label_27 ], [ %v_45 , %label_28 ]
-%v_47 = sub  i32 %p_2, 1
+%p_1=phi i32 [ %p_2 , %label_27 ], [ %v_45 , %label_28 ]
+%v_47 = sub  i32 %p_1, 1
 br label %label_30
 label_30:
 br label %label_25

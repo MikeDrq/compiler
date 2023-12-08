@@ -1,6 +1,7 @@
 package Middle.Value.Instruction.AllInstructions;
 
 import Middle.LlvmIrValue;
+import Middle.Type.IntType;
 import Middle.Type.PointerType;
 import Middle.Type.ValueType;
 import Middle.Value.Instruction.Instruction;
@@ -11,8 +12,8 @@ public class Getelementptr extends Instruction {
 
     private LlvmIrValue base;
     private int dim;
-    private String offset_row;
-    private String offset_column;
+    //private String offset_row;
+    //private String offset_column;
     private LlvmIrValue offset_row_value;
     private LlvmIrValue offset_column_value;
 
@@ -22,7 +23,7 @@ public class Getelementptr extends Instruction {
         super.setColumn(column);
         this.base = base;
         this.dim = dim;
-        this.offset_column = String.valueOf(offset);
+        this.offset_column_value = new LlvmIrValue(String.valueOf(offset),new IntType(32));
     }
 
     public Getelementptr(String name, ValueType valueType, LlvmIrValue base, int dim, int column,LlvmIrValue offset) {
@@ -31,7 +32,6 @@ public class Getelementptr extends Instruction {
         this.base = base;
         this.dim = dim;
         this.offset_column_value = offset;
-        this.offset_column = offset.getName();
         super.setDim(dim);
     }
 
@@ -42,8 +42,8 @@ public class Getelementptr extends Instruction {
         super.setColumn(column);
         this.base = base;
         this.dim = dim;
-        this.offset_row = String.valueOf(offset_row);
-        this.offset_column = String.valueOf(offset_column);
+        this.offset_row_value = new LlvmIrValue(String.valueOf(offset_row),new IntType(32));
+        this.offset_column_value = new LlvmIrValue(String.valueOf(offset_column),new IntType(32));
     }
 
     public Getelementptr(String name, ValueType valueType,LlvmIrValue base,int dim,int row,int column,LlvmIrValue offset_row,LlvmIrValue offset_column) {
@@ -53,8 +53,6 @@ public class Getelementptr extends Instruction {
         super.setRaw(row);
         this.base = base;
         this.dim = dim;
-        this.offset_row = offset_row.getName();
-        this.offset_column = offset_column.getName();
         this.offset_row_value = offset_row;
         this.offset_column_value = offset_column;
     }
@@ -64,7 +62,7 @@ public class Getelementptr extends Instruction {
     }
 
     public String getOffsetColumn() {
-        return offset_column;
+        return offset_column_value.getName();
     }
 
     public String getBaseName() {
@@ -72,7 +70,7 @@ public class Getelementptr extends Instruction {
     }
 
     public String getOffsetRow() {
-        return offset_row;
+        return offset_row_value.getName();
     }
 
     public int getRowNum() {
@@ -113,7 +111,7 @@ public class Getelementptr extends Instruction {
                             + base.getName() + "\n";
                 } else {
                     s = super.getName() + " = getelementptr " + part + ", " + part + "* "
-                            + base.getName() + ",i32 " + offset_column + "\n";
+                            + base.getName() + ",i32 " + offset_column_value.getName() + "\n";
                 }
             } else if (dim == 2) {
                 if (super.getRParamDim() == 2) {
@@ -121,24 +119,24 @@ public class Getelementptr extends Instruction {
                             + base.getName() + "\n";
                 } else if (super.getRParamDim() == 1) {
                     s = super.getName() + " = getelementptr " + part + ", " + part + "* "
-                            + base.getName() + ",i32 " + offset_row + ",i32 0\n";
+                            + base.getName() + ",i32 " + offset_row_value.getName() + ",i32 0\n";
                 } else {
                     s = super.getName() + " = getelementptr " + part + ", " + part + "* " +
-                            base.getName() + ",i32 " + offset_row + ",i32 " + offset_column + "\n";
+                            base.getName() + ",i32 " + offset_row_value.getName() + ",i32 " + offset_column_value.getName() + "\n";
                 }
             }
         } else {
             part = super.getType().midOutput();
             if (dim == 1) {
                 s = super.getName() + " = getelementptr " + part + ", " + part + "* "
-                        + base.getName() + ",i32 0,i32 " + offset_column + "\n";
+                        + base.getName() + ",i32 0,i32 " + offset_column_value.getName() + "\n";
             } else if (dim == 2) {
                 if (super.getRParamDim() == 2) {
                     s = super.getName() + " = getelementptr " + part + ", " + part + "* " +
                             base.getName() + ",i32 0,i32 0\n";
                 } else {
                     s = super.getName() + " = getelementptr " + part + ", " + part + "* " +
-                            base.getName() + ",i32 0,i32 " + offset_row + ",i32 " + offset_column + "\n";
+                            base.getName() + ",i32 0,i32 " + offset_row_value.getName() + ",i32 " + offset_column_value.getName() + "\n";
                 }
             }
         }
@@ -166,13 +164,11 @@ public class Getelementptr extends Instruction {
         if (offset_column_value != null) {
             if (offset_column_value.getName().equals(name)) {
                 offset_column_value = l;
-                offset_column = l.getName();
             }
         }
         if (offset_row_value != null) {
             if (offset_row_value.getName().equals(name)) {
                 offset_row_value = l;
-                offset_row = l.getName();
             }
         }
     }

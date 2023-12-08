@@ -9,67 +9,91 @@ declare void @putstr(i8*)
 
 define dso_local i32 @main() #0 {
 label_0:
+%v_0 = alloca i32
+store i32 2, i32* %v_0
+%v_1 = alloca i32
 %v_2 = call i32 @getint()
+store i32 %v_2, i32* %v_1
 br label %label_1
 label_1:
-%p_3=phi i32 [ 2 , %label_0 ], [ %v_11 , %label_3 ]
-%v_5 = icmp slt i32 %p_3, %v_2
+%v_3 = load i32, i32* %v_0
+%v_4 = load i32, i32* %v_1
+%v_5 = icmp slt i32 %v_3, %v_4
 %v_6 = zext i1 %v_5 to i32
 %v_7 = icmp ne i32 %v_6, 0
 br i1 %v_7,label %label_2,label %label_4
 label_2:
-%v_9 = getelementptr [510 x i32], [510 x i32]* @a,i32 0,i32 %p_3
+%v_8 = load i32, i32* %v_0
+%v_9 = getelementptr [510 x i32], [510 x i32]* @a,i32 0,i32 %v_8
 store i32 1, i32* %v_9
-%v_11 = add  i32 %p_3, 1
+%v_10 = load i32, i32* %v_0
+%v_11 = add  i32 %v_10, 1
+store i32 %v_11, i32* %v_0
 br label %label_3
 label_3:
 br label %label_1
 label_4:
+store i32 2, i32* %v_0
+%v_12 = alloca i32
+store i32 0, i32* %v_12
 br label %label_5
 label_5:
-%p_7=phi i32 [ 0 , %label_4 ], [ %p_6 , %label_16 ]
-%p_5=phi i32 [ 0 , %label_4 ], [ %p_4 , %label_16 ]
-%p_2=phi i32 [ 2 , %label_4 ], [ %v_59 , %label_16 ]
-%v_15 = icmp slt i32 %p_2, %v_2
+%v_13 = load i32, i32* %v_0
+%v_14 = load i32, i32* %v_1
+%v_15 = icmp slt i32 %v_13, %v_14
 %v_16 = zext i1 %v_15 to i32
 %v_17 = icmp ne i32 %v_16, 0
 br i1 %v_17,label %label_6,label %label_17
 label_6:
-%v_19 = getelementptr [510 x i32], [510 x i32]* @a,i32 0,i32 %p_2
+%v_18 = load i32, i32* %v_0
+%v_19 = getelementptr [510 x i32], [510 x i32]* @a,i32 0,i32 %v_18
 %v_20 = load i32, i32* %v_19
 %v_21 = icmp ne i32 %v_20, 0
 br i1 %v_21,label %label_7,label %label_8
 label_7:
-%v_24 = getelementptr [510 x i32], [510 x i32]* @prime,i32 0,i32 %p_7
-store i32 %p_2, i32* %v_24
-%v_26 = add  i32 %p_7, 1
+%v_22 = load i32, i32* %v_0
+%v_23 = load i32, i32* %v_12
+%v_24 = getelementptr [510 x i32], [510 x i32]* @prime,i32 0,i32 %v_23
+store i32 %v_22, i32* %v_24
+%v_25 = load i32, i32* %v_12
+%v_26 = add  i32 %v_25, 1
+store i32 %v_26, i32* %v_12
 br label %label_8
 label_8:
-%p_6=phi i32 [ %p_7 , %label_6 ], [ %v_26 , %label_7 ]
+%v_27 = alloca i32
+store i32 0, i32* %v_27
 br label %label_9
 label_9:
-%p_4=phi i32 [ 0 , %label_8 ], [ %v_57 , %label_14 ]
-%v_30 = icmp slt i32 %p_4, %p_6
+%v_28 = load i32, i32* %v_27
+%v_29 = load i32, i32* %v_12
+%v_30 = icmp slt i32 %v_28, %v_29
 %v_31 = zext i1 %v_30 to i32
 %v_32 = icmp ne i32 %v_31, 0
 br i1 %v_32,label %label_10,label %label_15
 label_10:
-%v_35 = getelementptr [510 x i32], [510 x i32]* @prime,i32 0,i32 %p_4
+%v_33 = load i32, i32* %v_0
+%v_34 = load i32, i32* %v_27
+%v_35 = getelementptr [510 x i32], [510 x i32]* @prime,i32 0,i32 %v_34
 %v_36 = load i32, i32* %v_35
-%v_37 = mul  i32 %p_2, %v_36
-%v_39 = icmp sle i32 %v_37, %v_2
+%v_37 = mul  i32 %v_33, %v_36
+%v_38 = load i32, i32* %v_1
+%v_39 = icmp sle i32 %v_37, %v_38
 %v_40 = zext i1 %v_39 to i32
 %v_41 = icmp ne i32 %v_40, 0
 br i1 %v_41,label %label_11,label %label_15
 label_11:
-%v_44 = getelementptr [510 x i32], [510 x i32]* @prime,i32 0,i32 %p_4
+%v_42 = load i32, i32* %v_0
+%v_43 = load i32, i32* %v_27
+%v_44 = getelementptr [510 x i32], [510 x i32]* @prime,i32 0,i32 %v_43
 %v_45 = load i32, i32* %v_44
-%v_46 = mul  i32 %p_2, %v_45
+%v_46 = mul  i32 %v_42, %v_45
 %v_47 = getelementptr [510 x i32], [510 x i32]* @a,i32 0,i32 %v_46
 store i32 0, i32* %v_47
-%v_50 = getelementptr [510 x i32], [510 x i32]* @prime,i32 0,i32 %p_4
+%v_48 = load i32, i32* %v_0
+%v_49 = load i32, i32* %v_27
+%v_50 = getelementptr [510 x i32], [510 x i32]* @prime,i32 0,i32 %v_49
 %v_51 = load i32, i32* %v_50
-%v_52 = srem  i32 %p_2, %v_51
+%v_52 = srem  i32 %v_48, %v_51
 %v_53 = icmp eq i32 %v_52, 0
 %v_54 = zext i1 %v_53 to i32
 %v_55 = icmp ne i32 %v_54, 0
@@ -77,48 +101,63 @@ br i1 %v_55,label %label_12,label %label_13
 label_12:
 br label %label_15
 label_13:
-%v_57 = add  i32 %p_4, 1
+%v_56 = load i32, i32* %v_27
+%v_57 = add  i32 %v_56, 1
+store i32 %v_57, i32* %v_27
 br label %label_14
 label_14:
 br label %label_9
 label_15:
-%v_59 = add  i32 %p_2, 1
+%v_58 = load i32, i32* %v_0
+%v_59 = add  i32 %v_58, 1
+store i32 %v_59, i32* %v_0
 br label %label_16
 label_16:
 br label %label_5
 label_17:
+store i32 0, i32* %v_0
 br label %label_18
 label_18:
-%p_1=phi i32 [ 0 , %label_17 ], [ %v_85 , %label_25 ]
 %v_60 = icmp ne i32 114514, 0
 br i1 %v_60,label %label_19,label %label_26
 label_19:
-%v_62 = getelementptr [510 x i32], [510 x i32]* @a,i32 0,i32 %p_1
+%v_61 = load i32, i32* %v_0
+%v_62 = getelementptr [510 x i32], [510 x i32]* @a,i32 0,i32 %v_61
 %v_63 = load i32, i32* %v_62
 %v_64 = icmp ne i32 %v_63, 0
 br i1 %v_64,label %label_20,label %label_21
 label_20:
-%v_67 = srem  i32 %p_1, 2
-%v_69 = srem  i32 %p_1, 16
+%v_65 = load i32, i32* %v_0
+%v_66 = load i32, i32* %v_0
+%v_67 = srem  i32 %v_66, 2
+%v_68 = load i32, i32* %v_0
+%v_69 = srem  i32 %v_68, 16
 %v_70 = getelementptr [16 x i32], [16 x i32]* @reflect1,i32 0,i32 %v_69
 %v_71 = load i32, i32* %v_70
 %v_72 = mul  i32 %v_67, %v_71
-%v_74 = add  i32 %p_1, 1
+%v_73 = load i32, i32* %v_0
+%v_74 = add  i32 %v_73, 1
 %v_75 = srem  i32 %v_74, 2
-%v_77 = srem  i32 %p_1, 5
-%v_79 = srem  i32 %p_1, 5
+%v_76 = load i32, i32* %v_0
+%v_77 = srem  i32 %v_76, 5
+%v_78 = load i32, i32* %v_0
+%v_79 = srem  i32 %v_78, 5
 %v_80 = getelementptr [5 x [5 x i32]], [5 x [5 x i32]]* @reflect2,i32 0,i32 %v_77,i32 %v_79
 %v_81 = load i32, i32* %v_80
 %v_82 = mul  i32 %v_75, %v_81
 %v_83 = add  i32 %v_72, %v_82
-call void @putint(i32 %p_1)
+call void @putint(i32 %v_65)
 call void @putch(i32 32)
 call void @putint(i32 %v_83)
 call void @putch(i32 10)
 br label %label_21
 label_21:
-%v_85 = add  i32 %p_1, 1
-%v_88 = icmp slt i32 %v_85, %v_2
+%v_84 = load i32, i32* %v_0
+%v_85 = add  i32 %v_84, 1
+store i32 %v_85, i32* %v_0
+%v_86 = load i32, i32* %v_0
+%v_87 = load i32, i32* %v_1
+%v_88 = icmp slt i32 %v_86, %v_87
 %v_89 = zext i1 %v_88 to i32
 %v_90 = icmp ne i32 %v_89, 0
 br i1 %v_90,label %label_22,label %label_23
@@ -126,9 +165,10 @@ label_22:
 br label %label_25
 label_23:
 br label %label_26
+label_24:
+br label %label_25
 label_25:
 br label %label_18
 label_26:
-%p_0=phi i32 [ %p_1 , %label_18 ], [ %v_85 , %label_23 ]
 ret  i32 0
 }

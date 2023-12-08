@@ -74,4 +74,8 @@ public class LlvmIrValue {
     public void setRaw(int raw) {
         this.raw = raw;
     }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
 }

@@ -92,7 +92,5 @@ public class Calculate extends Instruction {
         if (right.getName().equals(name)) {
             this.right = llvmIrValue;
         }
-        System.out.println("-------------------------");
-        System.out.println(this.midOutput());
     }
 }

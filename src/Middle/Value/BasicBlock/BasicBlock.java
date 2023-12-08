@@ -105,7 +105,20 @@ public class BasicBlock extends LlvmIrValue {
         this.instructions.add(1,phi);
     }
 
-    public HashMap<String,Stack<LlvmIrValue>> rename(HashMap<String,Stack<LlvmIrValue>> alloca) {
+    /*public ArrayList<Instruction> fillPhi(HashMap<String,Stack<LlvmIrValue>> alloc,BasicBlock parent) {
+        ArrayList<Instruction> t = new ArrayList<>();
+        for(Instruction instruction : instructions) {
+            if (instruction instanceof Phi) {
+                if (alloc.containsKey(instruction.getName())) {
+                    ((Phi) instruction).addValue(alloc.get(instruction.getName()).peek(),parent);
+                    t.add(instruction);
+                }
+            }
+        }
+        return t;
+    }*/
+
+    /*public HashMap<String,Stack<LlvmIrValue>> rename(HashMap<String,Stack<LlvmIrValue>> alloca) {
         Iterator<Instruction> iterator = instructions.iterator();
         int cnt = 0;
         while(iterator.hasNext()) {
@@ -113,6 +126,7 @@ public class BasicBlock extends LlvmIrValue {
             if (instruction instanceof Alloca) { //数组依然要用内存
                 if (instruction.getType() instanceof IntType || instruction.getType() instanceof PointerType) {
                     Stack<LlvmIrValue> alloStack = new Stack<>();
+                    alloStack.add(new LlvmIrValue("0",new IntType(32)));
                     alloca.put(instruction.getName(),alloStack);
                     iterator.remove();
                     cnt--;
@@ -120,6 +134,8 @@ public class BasicBlock extends LlvmIrValue {
             } else if (instruction instanceof Load) {
                 LlvmIrValue llvmIrValue = instruction.getOperand().get(0);
                 if (alloca.containsKey(llvmIrValue.getName())) {
+                    System.out.println(llvmIrValue.getName());
+                    System.out.println("name:" + instruction.getName());
                     LlvmIrValue replace = alloca.get(llvmIrValue.getName()).peek();
                     changeLoad(instruction.getName(), replace,cnt);
                     iterator.remove();
@@ -137,7 +153,13 @@ public class BasicBlock extends LlvmIrValue {
                 for (String k : alloca.keySet()) {
                     System.out.println(k);
                 }
-                alloca.get(instruction.getName()).add(instruction);
+                if (alloca.containsKey(instruction.getName())) {
+                    alloca.get(instruction.getName()).add(instruction);
+                } else {
+                    Stack<LlvmIrValue> alloStack = new Stack<>();
+                    alloStack.add(instruction);
+                    alloca.put(instruction.getName(),alloStack);
+                }
             }
             cnt++;
         }
@@ -154,5 +176,5 @@ public class BasicBlock extends LlvmIrValue {
                 }
             }
         }
-    }
+    }*/
 }

@@ -24,6 +24,7 @@ public class Compiler {
         ArrayList<String> grammarList;
         String input = "testfile.txt";
         String error_output = "error.txt";
+        String mid_output_origin = "llvm_ir_origin.txt";
         String mid_output = "llvm_ir.txt";
         String mips_output = "mips.txt";
         boolean testError = true;
@@ -63,7 +64,7 @@ public class Compiler {
         if (!hasError) {
             LlvmIr llvmIr = new LlvmIr(compUnitNode);
             LlvmIrModule llvmIrModule = llvmIr.generateIrModule();
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(mid_output))) {
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(mid_output_origin))) {
                     ArrayList<String> ans = llvmIrModule.midOutput();
                     for (String s : ans) {
                         writer.write(s);
@@ -74,7 +75,7 @@ public class Compiler {
             if (isCompetition) {
                 MemToReg memToReg = new MemToReg(llvmIrModule);
                 memToReg.doMemToReg();
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter("1.txt"))) {
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(mid_output))) {
                     ArrayList<String> ans = llvmIrModule.midOutput();
                     for (String s : ans) {
                         writer.write(s);

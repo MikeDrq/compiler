@@ -23,6 +23,10 @@ public class Instruction extends LlvmIrValue {
         return h;
     }
 
+    public void changeName(String name) {
+        super.changeName(name);
+    }
+
     public void change(String name,LlvmIrValue llvmIrValue) {
 
     }

@@ -34,7 +34,7 @@ public class Ret extends Instruction {
         if (isVoid) {
             s = s + "void\n";
         } else {
-            s = s + right.getType().midOutput() + " " + right.getName() + "\n";
+            s = s + " i32 " + right.getName() + "\n";
         }
         return s;
     }

@@ -1,6 +1,7 @@
 package Middle;
 
 import Middle.Value.BasicBlock.BasicBlock;
+import Middle.Value.BasicBlock.BasicBlockCnt;
 import Middle.Value.Func.Func;
 import Middle.Value.Func.FuncBuilder;
 import Middle.Value.GlobalVar.GlobalVar;
@@ -17,11 +18,13 @@ public class LlvmIr {
     private CompUnitNode compUnitNode;
     private LlvmIrModule llvmIrModule;
     private SymbolTable symbolTable;
+    private BasicBlockCnt basicBlockCnt;
 
     public LlvmIr(CompUnitNode compUnitNode) {
         this.compUnitNode = compUnitNode;
         this.llvmIrModule = new LlvmIrModule();
         this.symbolTable = new SymbolTable(null);
+        this.basicBlockCnt = new BasicBlockCnt();
     }
 
     public LlvmIrModule generateIrModule() {
@@ -34,12 +37,12 @@ public class LlvmIr {
         }
         //BasicBlockCnt bbc = new BasicBlockCnt();
         for (FuncDefNode funcDefNode:compUnitNode.getFuncDefNodes()) {
-            FuncBuilder funcBuilder = new FuncBuilder(funcDefNode,symbolTable);
+            FuncBuilder funcBuilder = new FuncBuilder(funcDefNode,symbolTable,basicBlockCnt);
             Func func = funcBuilder.generateFunc();
             llvmIrModule.addFunc(func);
         }
         MainFuncDefNode mainFuncDefNode = compUnitNode.getMainFuncDefNode();
-        FuncBuilder funcBuilder = new FuncBuilder(mainFuncDefNode,symbolTable);
+        FuncBuilder funcBuilder = new FuncBuilder(mainFuncDefNode,symbolTable,basicBlockCnt);
         Func func = funcBuilder.generateMainFun();
         llvmIrModule.addFunc(func);
         return llvmIrModule;
