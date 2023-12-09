@@ -65,7 +65,7 @@ public class FuncBuilder {
         symbol.setParams(symbols);
         symbolTable.addItem(symbol);
         type = new FuncType(ret,paramsLlvmIrType);
-        Func func = new Func("@"+funcDefNode.getIdent().getToken(),type);
+        Func func = new Func("@"+funcDefNode.getIdent().getToken(),type,funcCnt);
         symbol.setLlvmIrValue(func);
         BasicBlockBuilder basicBlockBuilder = new BasicBlockBuilder(funcCnt,basicBlockCnt);
         int num = basicBlockCnt.getCnt(); //第一个语句块
@@ -130,7 +130,7 @@ public class FuncBuilder {
         Symbol symbol = new Symbol(mainFuncDefNode.getMain(),SymbolType.FUNC);
         type = new FuncType(ret,paramsValueType);
         symbol.setParams(params);
-        Func func = new Func("@" + mainFuncDefNode.getMain().getToken(),type);
+        Func func = new Func("@" + mainFuncDefNode.getMain().getToken(),type,funcCnt);
         symbol.setLlvmIrValue(func);
         symbolTable.addItem(symbol);
         createNewTable();

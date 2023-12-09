@@ -1,4 +1,4 @@
-package Mem2Reg;
+package Opt;
 
 import Middle.LlvmIrModule;
 import Middle.LlvmIrValue;
@@ -7,6 +7,7 @@ import Middle.Type.PhiType;
 import Middle.Type.PointerType;
 import Middle.Value.BasicBlock.BasicBlock;
 import Middle.Value.Func.Func;
+import Middle.Value.Func.FuncCnt;
 import Middle.Value.Instruction.AllInstructions.*;
 import Middle.Value.Instruction.Instruction;
 
@@ -24,7 +25,7 @@ public class MemToReg {
     private HashMap<String,Stack<LlvmIrValue>> alloca;
     private HashMap<String,Boolean> isArrive;
     private ArrayList<Instruction> allPhi;
-    private int phiCnt;
+    private FuncCnt funcCnt;
 
     public MemToReg(LlvmIrModule llvmIrModule) {
         this.llvmIrModule = llvmIrModule;
@@ -53,6 +54,7 @@ public class MemToReg {
         ArrayList<Func> funcs = llvmIrModule.getFunctions();
         for (Func func:funcs) {
             System.out.println("-----------");
+            this.funcCnt = func.getFuncCnt();
             this.basicBlocks = func.getBasicBlocks();
             this.iDom = new HashMap<>();
             this.next = new HashMap<>();
@@ -70,6 +72,8 @@ public class MemToReg {
                 }
             }
             buildCFG();
+            func.setNext(next);
+            func.setPrev(prev);
             calculateDomain(); //basicDomain 基本支配
             calculateIDom(); //iDom 计算直接支配
             calculatesDom(); //basicDomain 计算严格支配
@@ -285,9 +289,8 @@ public class MemToReg {
                     HashSet<String> bn = domainFrontier.get(b.getName()); //Y块
                     for (String s : bn) {
                         if (!inserts.containsKey(s)) {
-                            Phi phi = new Phi( key, new PhiType(),"%p_"+phiCnt);
-                            phiCnt++;
                             BasicBlock bb = findBasicBlock(s);
+                            Phi phi = new Phi( key, new PhiType(),"%v_"+ funcCnt.getCnt());
                             bb.insertPhi(phi);
                             inserts.put(s,bb);
                             if (!isContainBb(db,bb)) {

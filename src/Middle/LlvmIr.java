@@ -47,4 +47,8 @@ public class LlvmIr {
         llvmIrModule.addFunc(func);
         return llvmIrModule;
     }
+
+    public BasicBlockCnt getBasicBlockCnt() {
+        return basicBlockCnt;
+    }
 }

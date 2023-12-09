@@ -4,15 +4,14 @@ import Lexer.Lexer;
 import java.io.*;
 import java.util.ArrayList;
 import Lexer.Token;
-import Mem2Reg.MemToReg;
+import Opt.MemToReg;
 import Middle.LlvmIr;
 import Middle.LlvmIrModule;
-import Middle.LlvmIrValue;
 import Mips.Mips;
 import Mips.MipsModule;
+import Opt.Opt;
 import Parser.Parser;
 import Error.Error;
-import SymbolTable.SymbolTable;
 import SyntaxTree.CompUnitNode;
 
 
@@ -73,8 +72,8 @@ public class Compiler {
                     System.out.println("output.txt 写入失败");
                 }
             if (isCompetition) {
-                MemToReg memToReg = new MemToReg(llvmIrModule);
-                memToReg.doMemToReg();
+                Opt opt = new Opt(llvmIrModule,llvmIr.getBasicBlockCnt());
+                opt.doOpt();
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(mid_output))) {
                     ArrayList<String> ans = llvmIrModule.midOutput();
                     for (String s : ans) {

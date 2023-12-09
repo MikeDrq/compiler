@@ -21,18 +21,11 @@ public class Func extends LlvmIrValue {
     private ArrayList<BasicBlock> basicBlocks = new ArrayList<>();
     private HashMap<String,ArrayList<String>> next = new HashMap<>(); //直接后继
     private HashMap<String,ArrayList<String>> prev = new HashMap<>();  //所有前驱
-    private HashMap<String, HashSet<String>> basicDomain = new HashMap<>(); //支配
-    private HashMap<String,String> iDom = new HashMap<>();//直接支配
-    private HashMap<String,LlvmIrValue> allStore = new HashMap<>();
-    private HashMap<String, HashSet<String>> domainFrontier = new HashMap<>(); //支配边界
-    private HashMap<String,Stack<LlvmIrValue>> alloca = new HashMap<>();
-    private HashMap<String,Boolean> isArrive = new HashMap<>();
-    private ArrayList<Instruction> allPhi = new ArrayList<>();
-    private int phiCnt;
-    public Func(String name,ValueType valueType) {
+    private FuncCnt funcCnt;
+    public Func(String name,ValueType valueType,FuncCnt funcCnt) {
         super(name,valueType);
         params = ((FuncType) super.getType()).getParams();
-        phiCnt = 0;
+        this.funcCnt = funcCnt;
     }
 
     public void addBasicBlocks(ArrayList<BasicBlock> basicBlocks) {
@@ -83,5 +76,25 @@ public class Func extends LlvmIrValue {
             System.out.println("error");
         }
         return sb.toString();
+    }
+
+    public void setNext(HashMap<String,ArrayList<String>> next) {
+        this.next = next;
+    }
+
+    public void setPrev(HashMap<String, ArrayList<String>> prev) {
+        this.prev = prev;
+    }
+
+    public HashMap<String, ArrayList<String>> getNext() {
+        return next;
+    }
+
+    public HashMap<String, ArrayList<String>> getPrev() {
+        return prev;
+    }
+
+    public FuncCnt getFuncCnt() {
+        return funcCnt;
     }
 }
