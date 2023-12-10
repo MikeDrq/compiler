@@ -17,15 +17,12 @@ public class MipsFuncBuilder {
     private StringCnt stringCnt;
     private MipsSymbolTable mipsSymbolTable;
     private HashMap<String,Integer> labelMatch;
-    private GlobalLabelCnt gbc;
 
-
-    public MipsFuncBuilder(Func func,StringCnt stringCnt,GlobalLabelCnt gbc) {
+    public MipsFuncBuilder(Func func,StringCnt stringCnt) {
         this.func = func;
         this.stringCnt = stringCnt;
         mipsSymbolTable = new MipsSymbolTable();
         labelMatch = new HashMap<>();
-        this.gbc = gbc;
         setParams();
     }
 
@@ -37,7 +34,6 @@ public class MipsFuncBuilder {
             MipsSymbol mipsSymbol = new MipsSymbol("%v_" + i,temp,param);
             temp = temp + 4;
             mipsSymbolTable.addMipsSymbol("%v_" + i,mipsSymbol);
-            //System.out.println(param.getDim());
         }
     }
 
@@ -58,7 +54,7 @@ public class MipsFuncBuilder {
         for (BasicBlock basicBlock : basicBlocks) {
             if (!basicBlock.getName().equals("-1")) {
                 MipsBasicBlockBuilder mipsBasicBlockBuilder = new MipsBasicBlockBuilder(basicBlock, stringCnt, mipsSymbolTable,
-                        register, isMain,offset,fp_offset,labelMatch,gbc);
+                        register, isMain,offset,fp_offset,labelMatch);
                 mipsFunc.addMipsBasicBlock(mipsBasicBlockBuilder.generateMipsBasicBlock(strings));
                 offset = mipsBasicBlockBuilder.getOffset();
                 fp_offset = mipsBasicBlockBuilder.getFpOffset();

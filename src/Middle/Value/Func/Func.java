@@ -12,6 +12,7 @@ import Middle.Value.Instruction.AllInstructions.Br;
 import Middle.Value.Instruction.AllInstructions.Phi;
 import Middle.Value.Instruction.InstructionType;
 import Middle.Value.Instruction.Instruction;
+import Mips.MipsInstruction.J;
 
 import java.util.*;
 
@@ -19,8 +20,9 @@ public class Func extends LlvmIrValue {
 
     private ArrayList<LlvmIrValue> params = new ArrayList<>();
     private ArrayList<BasicBlock> basicBlocks = new ArrayList<>();
-    private HashMap<String,ArrayList<String>> next = new HashMap<>(); //直接后继
-    private HashMap<String,ArrayList<String>> prev = new HashMap<>();  //所有前驱
+    private HashMap<String,String> iDom = new HashMap<>();
+    private HashMap<LlvmIrValue,Integer> varReg;
+
     private FuncCnt funcCnt;
     public Func(String name,ValueType valueType,FuncCnt funcCnt) {
         super(name,valueType);
@@ -77,24 +79,19 @@ public class Func extends LlvmIrValue {
         }
         return sb.toString();
     }
-
-    public void setNext(HashMap<String,ArrayList<String>> next) {
-        this.next = next;
-    }
-
-    public void setPrev(HashMap<String, ArrayList<String>> prev) {
-        this.prev = prev;
-    }
-
-    public HashMap<String, ArrayList<String>> getNext() {
-        return next;
-    }
-
-    public HashMap<String, ArrayList<String>> getPrev() {
-        return prev;
-    }
-
     public FuncCnt getFuncCnt() {
         return funcCnt;
+    }
+
+    public void setiDom(HashMap<String, String> iDom) {
+        this.iDom = iDom;
+    }
+
+    public HashMap<String, String> getiDom() {
+        return iDom;
+    }
+
+    public void addVarReg(HashMap<LlvmIrValue,Integer> varReg) {
+        this.varReg = varReg;
     }
 }

@@ -24,6 +24,14 @@ public class Phi extends Instruction {
            source.add(src);
     }
 
+    public ArrayList<LlvmIrValue> getSource() {
+        return source;
+    }
+
+    public ArrayList<LlvmIrValue> getValues() {
+        return values;
+    }
+
     public String getChangeName() {
         return this.changeName;
     }

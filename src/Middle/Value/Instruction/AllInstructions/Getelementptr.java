@@ -144,6 +144,11 @@ public class Getelementptr extends Instruction {
     }
 
     @Override
+    public LlvmIrValue getDefine() {
+        return this;
+    }
+
+    @Override
     public ArrayList<LlvmIrValue> getOperand() {
         ArrayList<LlvmIrValue> h = new ArrayList<>();
         h.add(base);

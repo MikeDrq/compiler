@@ -72,10 +72,15 @@ public class MemToReg {
                 }
             }
             buildCFG();
-            func.setNext(next);
-            func.setPrev(prev);
+            for (BasicBlock b : basicBlocks) {
+                b.setPrev(prev.get(b.getName()));
+                if (next.containsKey(b.getName())) {
+                    b.setNext(next.get(b.getName()));
+                }
+            }
             calculateDomain(); //basicDomain 基本支配
             calculateIDom(); //iDom 计算直接支配
+            func.setiDom(iDom);
             calculatesDom(); //basicDomain 计算严格支配
             calculateDomainFrontier(); //计算支配边界
             fillDefine();
@@ -317,6 +322,9 @@ public class MemToReg {
                     a.add(key);
                     tree.put(value, a);
                 }
+                BasicBlock b = findBasicBlock(value);
+                BasicBlock d = findBasicBlock(key);
+                b.addDomain(d);
             }
         }
         return init;

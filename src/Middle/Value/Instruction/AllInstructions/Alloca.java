@@ -33,4 +33,9 @@ public class Alloca extends Instruction {
         s = s + super.getName() + " = alloca " + super.getType().midOutput() + "\n";
         return s;
     }
+
+    @Override
+    public LlvmIrValue getDefine() {
+        return this;
+    }
 }

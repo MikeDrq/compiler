@@ -126,6 +126,14 @@ public class Call extends Instruction {
     }
 
     @Override
+    public LlvmIrValue getDefine() {
+        if (type == 0 || type == 1) {
+            return this;
+        }
+        return null;
+    }
+
+    @Override
     public ArrayList<LlvmIrValue> getOperand() {
         ArrayList<LlvmIrValue> h = new ArrayList<>();
         if (type == 0) {

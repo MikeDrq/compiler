@@ -16,31 +16,31 @@ label_0:
 store i32 1, i32* %v_9
 %v_10 = getelementptr [2 x i32], [2 x i32]* %v_8,i32 0,i32 1
 store i32 2, i32* %v_10
+move %v_56, 0
+move %v_52, 1
+move %v_49, 1
+move %v_47, 1
 br label %label_1
 label_1:
-%v_56=phi i32 [ 0 , %label_0 ], [ %v_55 , %label_15 ]
-%v_52=phi i32 [ 1 , %label_0 ], [ %v_51 , %label_15 ]
-%v_49=phi i32 [ 1 , %label_0 ], [ %v_48 , %label_15 ]
-%v_47=phi i32 [ 1 , %label_0 ], [ %v_45 , %label_15 ]
 %v_12 = icmp sle i32 %v_47, 3
 %v_13 = zext i1 %v_12 to i32
 %v_14 = icmp ne i32 %v_13, 0
 br i1 %v_14,label %label_2,label %label_16
 label_2:
+move %v_55, %v_56
+move %v_51, %v_52
+move %v_48, 1
 br label %label_3
 label_3:
-%v_55=phi i32 [ %v_56 , %label_2 ], [ %v_54 , %label_13 ]
-%v_51=phi i32 [ %v_52 , %label_2 ], [ %v_50 , %label_13 ]
-%v_48=phi i32 [ 1 , %label_2 ], [ %v_43 , %label_13 ]
 %v_16 = icmp sle i32 %v_48, 3
 %v_17 = zext i1 %v_16 to i32
 %v_18 = icmp ne i32 %v_17, 0
 br i1 %v_18,label %label_4,label %label_14
 label_4:
+move %v_54, %v_55
+move %v_50, 1
 br label %label_5
 label_5:
-%v_54=phi i32 [ %v_55 , %label_4 ], [ %v_53 , %label_11 ]
-%v_50=phi i32 [ 1 , %label_4 ], [ %v_41 , %label_11 ]
 %v_20 = icmp sle i32 %v_50, 3
 %v_21 = zext i1 %v_20 to i32
 %v_22 = icmp ne i32 %v_21, 0
@@ -49,38 +49,56 @@ label_6:
 %v_25 = icmp ne i32 %v_47, %v_48
 %v_26 = zext i1 %v_25 to i32
 %v_27 = icmp ne i32 %v_26, 0
-br i1 %v_27,label %label_7,label %label_10
+br i1 %v_27,label %label_7,label %label_60
 label_7:
 %v_30 = icmp ne i32 %v_47, %v_50
 %v_31 = zext i1 %v_30 to i32
 %v_32 = icmp ne i32 %v_31, 0
-br i1 %v_32,label %label_8,label %label_10
+br i1 %v_32,label %label_8,label %label_59
 label_8:
 %v_35 = icmp ne i32 %v_48, %v_50
 %v_36 = zext i1 %v_35 to i32
 %v_37 = icmp ne i32 %v_36, 0
-br i1 %v_37,label %label_9,label %label_10
+br i1 %v_37,label %label_9,label %label_58
 label_9:
 %v_39 = add  i32 %v_54, 1
+move %v_53, %v_54
 br label %label_10
 label_10:
-%v_53=phi i32 [ %v_54 , %label_6 ], [ %v_54 , %label_7 ], [ %v_54 , %label_8 ], [ %v_39 , %label_9 ]
 %v_41 = add  i32 %v_50, 1
 br label %label_11
 label_11:
+move %v_54, %v_53
+move %v_50, %v_41
 br label %label_5
 label_12:
 %v_43 = add  i32 %v_48, 1
 br label %label_13
 label_13:
+move %v_55, %v_54
+move %v_51, %v_50
+move %v_48, %v_43
 br label %label_3
 label_14:
 %v_45 = add  i32 %v_47, 1
 br label %label_15
 label_15:
+move %v_56, %v_55
+move %v_52, %v_51
+move %v_49, %v_48
+move %v_47, %v_45
 br label %label_1
 label_16:
 ret  i32 %v_56
+label_58:
+move %v_53, %v_54
+br label %label_10
+label_59:
+move %v_53, %v_54
+br label %label_10
+label_60:
+move %v_53, %v_39
+br label %label_10
 }
 
 define dso_local i32 @judgeB(i32 %v_0,i32 %v_1) #0 {
@@ -140,9 +158,9 @@ ret  i32 0
 
 define dso_local void @printArr(i32* %v_0) #0 {
 label_33:
+move %v_13, 0
 br label %label_34
 label_34:
-%v_13=phi i32 [ 0 , %label_33 ], [ %v_12 , %label_36 ]
 %v_4 = icmp slt i32 %v_13, 2
 %v_5 = zext i1 %v_4 to i32
 %v_6 = icmp ne i32 %v_5, 0
@@ -154,6 +172,7 @@ call void @putint(i32 %v_10)
 %v_12 = add  i32 %v_13, 1
 br label %label_36
 label_36:
+move %v_13, %v_12
 br label %label_34
 label_37:
 call void @putch(i32 10)
@@ -162,9 +181,9 @@ ret void
 
 define dso_local void @printArr2([2 x i32] *%v_0) #0 {
 label_38:
+move %v_12, 0
 br label %label_39
 label_39:
-%v_12=phi i32 [ 0 , %label_38 ], [ %v_11 , %label_41 ]
 %v_4 = icmp slt i32 %v_12, 4
 %v_5 = zext i1 %v_4 to i32
 %v_6 = icmp ne i32 %v_5, 0
@@ -175,6 +194,7 @@ call void @printArr(i32* %v_9)
 %v_11 = add  i32 %v_12, 1
 br label %label_41
 label_41:
+move %v_12, %v_11
 br label %label_39
 label_42:
 ret void
@@ -210,11 +230,11 @@ label_46:
 %v_4 = icmp eq i32 1, 0
 %v_5 = zext i1 %v_4 to i32
 %v_6 = icmp ne i32 %v_5, 0
-br i1 %v_6,label %label_47,label %label_48
+br i1 %v_6,label %label_47,label %label_61
 label_47:
+move %v_47, 1
 br label %label_48
 label_48:
-%v_47=phi i32 [ 1 , %label_46 ], [ 0 , %label_47 ]
 %v_7 = sub  i32 0, 1
 %v_9 = add  i32 16, 2
 %v_11 = add  i32 0, 1
@@ -223,10 +243,10 @@ label_48:
 %v_14 = getelementptr [4 x [2 x i32]], [4 x [2 x i32]]* @next,i32 0,i32 0,i32 0
 %v_15 = load i32, i32* %v_14
 %v_16 = add  i32 %v_13, %v_15
+move %v_49, 0
+move %v_46, 0
 br label %label_49
 label_49:
-%v_49=phi i32 [ 0 , %label_48 ], [ %v_48 , %label_56 ]
-%v_46=phi i32 [ 0 , %label_48 ], [ %v_45 , %label_56 ]
 %v_18 = icmp sle i32 %v_46, 5
 %v_19 = zext i1 %v_18 to i32
 %v_20 = icmp ne i32 %v_19, 0
@@ -238,6 +258,8 @@ label_50:
 br i1 %v_24,label %label_51,label %label_52
 label_51:
 %v_26 = add  i32 %v_46, 1
+move %v_48, %v_49
+move %v_45, %v_26
 br label %label_56
 label_52:
 %v_28 = icmp eq i32 %v_46, 5
@@ -250,10 +272,12 @@ label_54:
 br label %label_55
 label_55:
 %v_34 = add  i32 %v_46, 1
+move %v_48, %v_46
+move %v_45, %v_34
 br label %label_56
 label_56:
-%v_48=phi i32 [ %v_49 , %label_51 ], [ %v_46 , %label_55 ]
-%v_45=phi i32 [ %v_26 , %label_51 ], [ %v_34 , %label_55 ]
+move %v_49, %v_48
+move %v_46, %v_45
 br label %label_49
 label_57:
 %v_35 = call i32 @getint()
@@ -287,4 +311,7 @@ call void @printArr(i32* %v_43)
 %v_44 = getelementptr [2 x i32], [2 x i32]* @arr,i32 0,i32 0
 call void @printArr(i32* %v_44)
 ret  i32 0
+label_61:
+move %v_47, 0
+br label %label_48
 }
