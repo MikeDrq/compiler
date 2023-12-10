@@ -20,11 +20,12 @@ public class MipsFuncBuilder {
     private GlobalLabelCnt gbc;
 
 
-    public MipsFuncBuilder(Func func,StringCnt stringCnt) {
+    public MipsFuncBuilder(Func func,StringCnt stringCnt,GlobalLabelCnt gbc) {
         this.func = func;
         this.stringCnt = stringCnt;
         mipsSymbolTable = new MipsSymbolTable();
         labelMatch = new HashMap<>();
+        this.gbc = gbc;
         setParams();
     }
 

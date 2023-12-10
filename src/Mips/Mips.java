@@ -34,8 +34,9 @@ public class Mips {
         ArrayList<Func> funcs = llvmIrModule.getFunctions();
         StringCnt stringCnt = new StringCnt(); //字符串计数
         ArrayList<String> strings = new ArrayList<>(); //记录出现的字符串
+        GlobalLabelCnt gcb = new GlobalLabelCnt();
         for (Func func : funcs) {
-            MipsFuncBuilder mipsFuncBuilder = new MipsFuncBuilder(func,stringCnt);
+            MipsFuncBuilder mipsFuncBuilder = new MipsFuncBuilder(func,stringCnt,gcb);
             MipsFunc mipsFunc = mipsFuncBuilder.generateMipsFuncs(strings);
             mipsModule.addMipsFunc(mipsFunc);
         }
