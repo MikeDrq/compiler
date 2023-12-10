@@ -17,6 +17,8 @@ public class MipsFuncBuilder {
     private StringCnt stringCnt;
     private MipsSymbolTable mipsSymbolTable;
     private HashMap<String,Integer> labelMatch;
+    private GlobalLabelCnt gbc;
+
 
     public MipsFuncBuilder(Func func,StringCnt stringCnt) {
         this.func = func;
@@ -54,7 +56,7 @@ public class MipsFuncBuilder {
         for (BasicBlock basicBlock : basicBlocks) {
             if (!basicBlock.getName().equals("-1")) {
                 MipsBasicBlockBuilder mipsBasicBlockBuilder = new MipsBasicBlockBuilder(basicBlock, stringCnt, mipsSymbolTable,
-                        register, isMain,offset,fp_offset,labelMatch);
+                        register, isMain,offset,fp_offset,labelMatch,gbc);
                 mipsFunc.addMipsBasicBlock(mipsBasicBlockBuilder.generateMipsBasicBlock(strings));
                 offset = mipsBasicBlockBuilder.getOffset();
                 fp_offset = mipsBasicBlockBuilder.getFpOffset();
