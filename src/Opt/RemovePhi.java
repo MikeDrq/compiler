@@ -210,7 +210,7 @@ public class RemovePhi {
                 int flag = 0;
                 for (int j = 0;j < i;j++) {
                     if (varReg != null && varReg.containsKey(moves.get(i).getSrc())) {
-                        if (varReg.get(moves.get(j).getDst()).equals(varReg.get(moves.get(i).getSrc()))) {
+                        if (varReg.containsKey(moves.get(j).getDst()) && varReg.get(moves.get(j).getDst()).equals(varReg.get(moves.get(i).getSrc()))) {
                             flag = 1;
                             System.out.println("---" + moves.get(j).getDst().getName());
                             break;
