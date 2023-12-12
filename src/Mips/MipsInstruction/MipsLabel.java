@@ -1,14 +1,14 @@
 package Mips.MipsInstruction;
 
 public class MipsLabel extends MipsInstruction {
-    private int  num;
-    public MipsLabel(int num) {
+    private String name;
+    public MipsLabel(String name) {
         super("label");
-        this.num = num;
+        this.name = name;
     }
 
     @Override
     public String mipsOutput() {
-        return "label_" + num + ":\n";
+        return "label_" + name + ":\n";
     }
 }

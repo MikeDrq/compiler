@@ -4,6 +4,7 @@ import Lexer.Token;
 import Middle.Type.ValueType;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class LlvmIrValue {
 
@@ -77,5 +78,18 @@ public class LlvmIrValue {
 
     public void changeName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        LlvmIrValue that = (LlvmIrValue) o;
+        return Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

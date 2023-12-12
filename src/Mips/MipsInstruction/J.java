@@ -1,16 +1,16 @@
 package Mips.MipsInstruction;
 
 public class J extends MipsInstruction {
-    private int label;
-    public J(int num) {
+    private String label;
+    public J(String label) {
         super("j");
-        this.label = num;
+        this.label = label;
     }
 
     @Override
     public String mipsOutput() {
         StringBuilder sb = new StringBuilder();
-        sb.append("j ").append("label_").append(label).append("\n");
+        sb.append("j label_").append(label).append("\n");
         return sb.toString();
     }
 }

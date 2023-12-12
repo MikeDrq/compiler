@@ -12,10 +12,9 @@ import Mips.MipsSymbolTable.MipsSymbol;
 import Mips.MipsSymbolTable.MipsSymbolTable;
 import Mips.Register;
 import Mips.GlobalLabelCnt;
+import SymbolTable.SymbolTable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 public class MipsBasicBlockBuilder {
     private BasicBlock basicBlock;
@@ -26,12 +25,10 @@ public class MipsBasicBlockBuilder {
     private int fp_offset;
     private MipsBasicBlock mipsBasicBlock;
     private Boolean isMain;
-    private HashMap<String,Integer> labelMatch;
-    private GlobalLabelCnt gbc;
+    private HashMap<LlvmIrValue,Integer> varReg;
 
     public MipsBasicBlockBuilder(BasicBlock basicBlock, StringCnt stringCnt, MipsSymbolTable mipsSymbolTable,
-                                 Register register, Boolean isMain, int offset, int fp_offset, HashMap<String,Integer
-            > labelMatch,GlobalLabelCnt gbc) {
+                                 Register register, Boolean isMain, int offset, int fp_offset, HashMap<LlvmIrValue,Integer> varReg) {
         this.basicBlock = basicBlock;
         this.stringCnt = stringCnt;
         this.mipsSymbolTable = mipsSymbolTable;
@@ -40,8 +37,7 @@ public class MipsBasicBlockBuilder {
         this.fp_offset = fp_offset;
         this.mipsBasicBlock = new MipsBasicBlock();
         this.isMain = isMain;
-        this.labelMatch = labelMatch;
-        this.gbc = gbc;
+        this.varReg = varReg;
     }
 
     public void setMipsSymbolTable(String name, MipsSymbol mipsSymbol) {
@@ -60,30 +56,25 @@ public class MipsBasicBlockBuilder {
         LinkedList<Instruction> instructions = basicBlock.getInstructions();
         for (int i = 0;i < instructions.size();i++) {
             Instruction instruction = instructions.get(i);
-            if (instruction instanceof Alloca) { //填个符号表
+            if (instruction instanceof Alloca) { //只有栈中存储的，才填符号表
                 dealAlloca(instruction);
             } else if (instruction instanceof Br) {
-                //mips_2_br
                 dealBr(instruction);
             } else if (instruction instanceof Calculate) {
                 dealCalculate(instruction);
             } else if (instruction instanceof Getelementptr) {
-                //mips_2_array
                 dealGetelementptr(instruction);
             } else if (instruction instanceof Label) {
-                //mips_2_label
                 String name = instruction.getName();
-                int num = acquireLabel(name);
-                MipsLabel mipsLabel = new MipsLabel(num);
+                MipsLabel mipsLabel = new MipsLabel(name);
                 mipsBasicBlock.addInstruction(mipsLabel);
             } else if (instruction instanceof Load) {
-                dealLoad(instruction); //只需要t0,t1,t2,t3
+                dealLoad(instruction);
             } else if (instruction instanceof Ret) {
                 dealRet(instruction);
             } else if (instruction instanceof Store) {
                 dealStore(instruction);
             } else if (instruction instanceof Zext) {
-                //mips_2_zext
                 dealZext(instruction);
             } else if (instruction instanceof Call) {
                 if (((Call) instruction).getMark() == 3) {
@@ -117,6 +108,8 @@ public class MipsBasicBlockBuilder {
                 } else {
                     dealCall(instruction);
                 }
+            } else if (instruction instanceof  MidMove){
+                dealMidMove(instruction);
             } else {
                 System.out.println("instructions type error");
             }
@@ -124,54 +117,34 @@ public class MipsBasicBlockBuilder {
         return mipsBasicBlock;
     }
 
-    public int findReg() {
-        int reg = 0;
-        for (int j = 8;j <=15;j++) {
-            if (register.canUseNow(j)) {
-                reg = j;
-                register.useRegister(reg);
-                break;
-            }
+    public Boolean isAllocated(LlvmIrValue llvmIrValue) {
+        if (varReg.containsKey(llvmIrValue)) {
+            return true;
         }
-        if (reg == 0) {
-            System.out.println("error when allocate registers");
-        }
-        return reg;
+        return false;
     }
 
-    public int getOperandReg(String name) { //只能是右侧操作数，可以是%（一定在符号表），可以是@，可以是const
-        int reg = 0;
+    public int getReg(LlvmIrValue llvmIrValue) {
+        return varReg.get(llvmIrValue);
+    }
+
+    public void findFromMem(String name,int num) {
+        MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
         if (name.charAt(0) == '%') {
-            reg = findReg();
-            if (mipsSymbolTable.containsMipsSymbol(name)) {
-                MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
-                int pos = mipsSymbol.getOffset();
-                Lw lw = new Lw(reg,29,pos);
-                mipsBasicBlock.addInstruction(lw);
-            } else {
-                System.out.println("should not happen,cannot find operand");
-            }
-        } else if (name.charAt(0) == '@') {
-            reg = findReg();
-            Lw lw = new Lw(reg,name.substring(1));
+            int pos = mipsSymbol.getOffset();
+            Lw lw = new Lw(num,29,pos);
             mipsBasicBlock.addInstruction(lw);
         } else {
-            reg = findReg();
-            Li li = new Li(reg,Integer.parseInt(name));
-            mipsBasicBlock.addInstruction(li);
+            Lw lw = new Lw(num,name.substring(1));
+            mipsBasicBlock.addInstruction(lw);
         }
-        return reg;
     }
 
-
-    public int acquireLabel(String name) {
-        if (labelMatch.containsKey(name)) {
-            return labelMatch.get(name);
-        } else {
-            int num = gbc.getLabelCnt();
-            labelMatch.put(name,num);
-            return num;
+    public Boolean isConstant(String name) {
+        if (name.charAt(0) == '@' || name.charAt(0) == '%') {
+            return false;
         }
+        return true;
     }
 
     public void dealBr(Instruction instruction) {
@@ -179,18 +152,21 @@ public class MipsBasicBlockBuilder {
         if (!br.getJumpWithNoCondition()) {
             String tLabel = br.getTrueLabel().getName();
             String fLabel = br.getFalseLabel().getName();
-            int num = acquireLabel(fLabel);
-            int reg = getOperandReg(br.getCondName());
-            Beq beq = new Beq(reg,num);
+            int reg = 26;
+            if (isAllocated(br.getCond())) {
+                reg = getReg(br.getCond());
+            } else {
+                MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(br.getCond().getName());
+                Lw lw = new Lw(reg,29,mipsSymbol.getOffset());
+                mipsBasicBlock.addInstruction(lw);
+            }
+            Beq beq = new Beq(reg,fLabel);
             mipsBasicBlock.addInstruction(beq);
-            num = acquireLabel(tLabel);
-            J j = new J(num);
+            J j = new J(tLabel);
             mipsBasicBlock.addInstruction(j);
-            register.freeRegister(reg);
         } else {
             String label = br.getJumpName();
-            int num = acquireLabel(label);
-            J j = new J(num);
+            J j = new J(label);
             mipsBasicBlock.addInstruction(j);
         }
     }
@@ -198,40 +174,41 @@ public class MipsBasicBlockBuilder {
     public void dealAlloca(Instruction instruction) {
         LlvmIrValue llvmIrValue = ((Alloca) instruction).getLlvmIrValue();
         if (llvmIrValue.getDim() == 0) {
-            MipsSymbol mipsSymbol = new MipsSymbol(instruction.getName(), offset, llvmIrValue);
-            setMipsSymbolTable(instruction.getName(), mipsSymbol);
-            offset = offset - 4;
-        } else if (llvmIrValue.getDim() == 1) {
+            System.out.println("ERROR!Var do not use alloca!");
+        } else if (llvmIrValue.getDim() == 1) { //只有第一次定义的数组才有alloca，函数传参也改了
             MipsSymbol mipsSymbol = new MipsSymbol(instruction.getName(),offset,llvmIrValue);
             setMipsSymbolTable(instruction.getName(),mipsSymbol);
-            if (!(instruction.getType() instanceof PointerType)) {
-                mipsSymbol.setFpOffset(fp_offset);
-                int reg = findReg();
+            if (isAllocated(instruction)) {
+                int reg = getReg(instruction);
+                Addi addi = new Addi(30, reg, fp_offset);
+                mipsBasicBlock.addInstruction(addi);
+                fp_offset = fp_offset + llvmIrValue.getColumn() * 4;
+            } else {
+                int reg = 26;
                 Addi addi = new Addi(30, reg, fp_offset); //计算绝对首地址
                 mipsBasicBlock.addInstruction(addi);
                 Sw sw = new Sw(reg, 29, offset); //存入首地址
                 mipsBasicBlock.addInstruction(sw);
                 fp_offset = fp_offset + llvmIrValue.getColumn() * 4;
                 offset = offset - 4;
-                register.freeRegister(reg);
-            } else {
-                offset = offset - 4;
             }
         } else if (llvmIrValue.getDim() == 2) {
             MipsSymbol mipsSymbol = new MipsSymbol(instruction.getName(),offset,llvmIrValue);
             setMipsSymbolTable(instruction.getName(),mipsSymbol);
-            if (!(instruction.getType() instanceof PointerType)) {
-                mipsSymbol.setFpOffset(fp_offset);
-                int reg = findReg();
+            if (varReg != null && isAllocated(llvmIrValue)) {
+                int reg = getReg(instruction);
+                Addi addi = new Addi(30, reg, fp_offset);
+                mipsBasicBlock.addInstruction(addi);
+                int pos = llvmIrValue.getColumn() * llvmIrValue.getRaw() * 4;
+                fp_offset = fp_offset + pos;
+            } else {
+                int reg = 26;
                 Addi addi = new Addi(30, reg, fp_offset); //计算绝对首地址
                 mipsBasicBlock.addInstruction(addi);
                 Sw sw = new Sw(reg, 29, offset); //存入首地址
                 mipsBasicBlock.addInstruction(sw);
                 int pos = llvmIrValue.getColumn() * llvmIrValue.getRaw() * 4;
                 fp_offset = fp_offset + pos;
-                offset = offset - 4;
-                register.freeRegister(reg);
-            } else {
                 offset = offset - 4;
             }
         } else {
@@ -244,9 +221,33 @@ public class MipsBasicBlockBuilder {
         String cond = ((Calculate) instruction).getCond();
         String name1 = operand1.getName();
         String name2 = operand2.getName();
-        int reg1 = getOperandReg(name1); //ok
-        int reg2 = getOperandReg(name2); //ok
-        int reg3 = findReg();
+        int reg1 = 26;
+        int reg2 = 27;
+        int reg3 = 26;
+        if (!isConstant(name1)) {
+            System.out.println(name1);
+            if (isAllocated(operand1)) {
+                reg1 = getReg(operand1);
+            } else {
+                findFromMem(name1,reg1);
+            }
+        } else {
+            Li li = new Li(reg1,Integer.parseInt(name1));
+            mipsBasicBlock.addInstruction(li);
+        }
+        if (!isConstant(name2)) {
+            if (isAllocated(operand2)) {
+                reg2 = getReg(operand2);
+            } else {
+                findFromMem(name2,reg2);
+            }
+        } else {
+            Li li = new Li(reg2,Integer.parseInt(name2));
+            mipsBasicBlock.addInstruction(li);
+        }
+        if (isAllocated(instruction)) {
+            reg3 = getReg(instruction);
+        }
         if (cond.equals("slt")) {
             Compare compare = new Compare("slt",reg1,reg2,reg3);
             mipsBasicBlock.addInstruction(compare);
@@ -260,48 +261,33 @@ public class MipsBasicBlockBuilder {
             Compare compare = new Compare("sge",reg1,reg2,reg3);
             mipsBasicBlock.addInstruction(compare);
         } else if (cond.equals("ne")) {
-            Compare compare = new Compare("sgt",reg1,reg2,reg3);
+            Compare compare = new Compare("sne",reg1,reg2,reg3);
             mipsBasicBlock.addInstruction(compare);
-            int reg4 = findReg();
-            compare = new Compare("slt",reg1,reg2,reg4);
-            mipsBasicBlock.addInstruction(compare);
-            MipsCalculate mipsCalculate = new MipsCalculate("or",reg3,reg4,reg3);
-            mipsBasicBlock.addInstruction(mipsCalculate);
-            register.freeRegister(reg4);
         } else if (cond.equals("eq")) {
-            Compare compare = new Compare("sge",reg1,reg2,reg3);
+            Compare compare = new Compare("seq",reg1,reg2,reg3);
             mipsBasicBlock.addInstruction(compare);
-            int reg4 = findReg();
-            compare = new Compare("sle",reg1,reg2,reg4);
-            mipsBasicBlock.addInstruction(compare);
-            MipsCalculate mipsCalculate = new MipsCalculate("and",reg3,reg4,reg3);
-            mipsBasicBlock.addInstruction(mipsCalculate);
-            register.freeRegister(reg4);
         } else {
             System.out.println("unexpected cond in icmp");
         }
-        int pos = 0;
-        if (name.charAt(0) == '%') {
-            if (mipsSymbolTable.containsMipsSymbol(name)) {
-                MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
-                pos = mipsSymbol.getOffset();
-            } else {
-                pos = offset;
-                MipsSymbol mipsSymbol = new MipsSymbol(name,offset,instruction);
-                offset = offset - 4;
-                mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
+        if (!isAllocated(instruction)) {
+            if (name.charAt(0) == '%') {
+                int pos;
+                if (mipsSymbolTable.containsMipsSymbol(name)) {
+                    MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
+                    pos = mipsSymbol.getOffset();
+                } else {
+                    pos = offset;
+                    MipsSymbol mipsSymbol = new MipsSymbol(name,offset,instruction);
+                    offset = offset - 4;
+                    mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
+                }
+                Sw sw = new Sw(reg3,29,pos);
+                mipsBasicBlock.addInstruction(sw);
+            } else if (name.charAt(0) == '@') {
+                Sw sw = new Sw(reg3,name.substring(1));
+                mipsBasicBlock.addInstruction(sw);
             }
-            Sw sw = new Sw(reg3,29,pos);
-            mipsBasicBlock.addInstruction(sw);
-        } else if (name.charAt(0) == '@') {
-            Sw sw = new Sw(reg3,name.substring(1));
-            mipsBasicBlock.addInstruction(sw);
-        } else {
-            System.out.println("wrong!");
         }
-        register.freeRegister(reg1);
-        register.freeRegister(reg2);
-        register.freeRegister(reg3);
     }
 
     public void dealCalculate(Instruction instruction) {
@@ -327,66 +313,93 @@ public class MipsBasicBlockBuilder {
         }
         String name1 = operand1.getName();
         String name2 = operand2.getName();
-        int reg1 = getOperandReg(name1); //ok
-        int reg2 = getOperandReg(name2); //ok
-        int reg3 = findReg();
+        int reg1 = 26; //$k0
+        int reg2 = 27; //$k1
+        int reg3 = 26;
+        if (isAllocated(instruction)) {
+            reg3 = getReg(instruction);
+        }
+        if (!isConstant(name1)) {
+            if (isAllocated(operand1)) {
+                reg1 = getReg(operand1);
+            } else {
+                findFromMem(name1,reg1);
+            }
+        } else {
+            Li li = new Li(reg1,Integer.parseInt(name1));
+            mipsBasicBlock.addInstruction(li);
+        }
+        if (!isConstant(name2)) {
+            if (isAllocated(operand2)) {
+                reg2 = getReg(operand2);
+            } else {
+                findFromMem(name2,reg2);
+            }
+        } else {
+            Li li = new Li(reg2,Integer.parseInt(name2));
+            mipsBasicBlock.addInstruction(li);
+        }
         MipsCalculate mipsCalculate = new MipsCalculate(instr,reg1,reg2,reg3);
         mipsBasicBlock.addInstruction(mipsCalculate);
         if (instr.equals("srem")) {
-            Mfhi mfhi = new Mfhi(reg1);
+            Mfhi mfhi = new Mfhi(reg3);
             mipsBasicBlock.addInstruction(mfhi);
-            register.freeRegister(reg3);
-            reg3 = reg1;
         }
-        int pos = 0;
-        if (name.charAt(0) == '%') {
-            if (mipsSymbolTable.containsMipsSymbol(name)) {
-                MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
-                pos = mipsSymbol.getOffset();
-            } else {
-                pos = offset;
-                MipsSymbol mipsSymbol = new MipsSymbol(name,offset,instruction);
+        if (!isAllocated(instruction)) {
+            MipsSymbol mipsSymbol = new MipsSymbol(name,offset,instruction);
+            mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
+            if (name.charAt(0) == '%') {
+                Sw sw = new Sw(reg3,29,offset);
+                mipsBasicBlock.addInstruction(sw);
                 offset = offset - 4;
-                mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
+            } else {
+                Sw sw = new Sw(reg3,name.substring(1));
+                mipsBasicBlock.addInstruction(sw);
             }
-            Sw sw = new Sw(reg3,29,pos);
-            mipsBasicBlock.addInstruction(sw);
-        } else if (name.charAt(0) == '@') {
-            Sw sw = new Sw(reg3,name.substring(1));
-            mipsBasicBlock.addInstruction(sw);
-        } else {
-            System.out.println("wrong!");
         }
-        register.freeRegister(reg1);
-        register.freeRegister(reg2);
-        register.freeRegister(reg3);
+
     }
 
     public void dealZext(Instruction instruction) {
         Zext zext = (Zext) instruction;
         String name = zext.getName();
+        LlvmIrValue value = zext.getValue();
         String valueName = zext.getValueName();
-        int reg = getOperandReg(valueName);
-        int pos = 0;
-        if (name.charAt(0) == '%') {
-            if (mipsSymbolTable.containsMipsSymbol(name)) {
-                MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
-                pos = mipsSymbol.getOffset();
-            } else {
-                pos = offset;
-                MipsSymbol mipsSymbol = new MipsSymbol(name,offset,instruction);
-                offset = offset - 4;
-                mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
-            }
-            Sw sw = new Sw(reg,29,pos);
-            mipsBasicBlock.addInstruction(sw);
-        } else if (name.charAt(0) == '@') {
-            Sw sw = new Sw(reg,name.substring(1));
-            mipsBasicBlock.addInstruction(sw);
+        int reg1 = 26;
+        int reg2 = 26;
+        if (isAllocated(value)) {
+            reg1 = getReg(value);
         } else {
-            System.out.println("wrong!");
+            if (isConstant(valueName)) {
+                Li li = new Li(reg1,Integer.parseInt(valueName));
+                mipsBasicBlock.addInstruction(li);
+            } else {
+                findFromMem(valueName,reg1);
+            }
         }
-        register.freeRegister(reg);
+        if (isAllocated(instruction)) {
+            reg2 =getReg(instruction);
+            Move move = new Move(reg2,reg1);
+            mipsBasicBlock.addInstruction(move);
+        } else {
+            int pos = 0;
+            if (name.charAt(0) == '%') {
+                if (mipsSymbolTable.containsMipsSymbol(name)) {
+                    MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
+                    pos = mipsSymbol.getOffset();
+                } else {
+                    pos = offset;
+                    MipsSymbol mipsSymbol = new MipsSymbol(name,offset,instruction);
+                    offset = offset - 4;
+                    mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
+                }
+                Sw sw = new Sw(reg1,29,pos);
+                mipsBasicBlock.addInstruction(sw);
+            } else if (name.charAt(0) == '@') {
+                Sw sw = new Sw(reg1,name.substring(1));
+                mipsBasicBlock.addInstruction(sw);
+            }
+        }
     }
 
     public void dealStore(Instruction instruction) {
@@ -395,56 +408,42 @@ public class MipsBasicBlockBuilder {
         String nameLeft = left.getName();
         String nameRight = right.getName();
         if (right.getDim() == 0) {
-            int reg1 = getOperandReg(nameLeft); //ok
-            if (nameRight.charAt(0) == '%') {
-                int pos = -1;
-                if (mipsSymbolTable.containsMipsSymbol(nameRight)) {
-                    MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(nameRight);
-                    pos = mipsSymbol.getOffset();
+            int reg = 26;
+            if (isConstant(nameLeft)) {
+                Li li = new Li(reg,Integer.parseInt(nameLeft));
+                mipsBasicBlock.addInstruction(li);
+            } else {
+                if (isAllocated(left)) {
+                    reg = getReg(left);
                 } else {
-                    System.out.println("should not happen,cannot find operand");
-                }
-                Sw sw = new Sw(reg1, 29, pos);
-                mipsBasicBlock.addInstruction(sw);
-            } else if (nameRight.charAt(0) == '@') {
-                Sw sw = new Sw(reg1, nameRight.substring(1));
-                mipsBasicBlock.addInstruction(sw);
-            } else {
-                System.out.println("illegal name");
-            }
-            register.freeRegister(reg1);
-        } else {
-            if (!(left.getType() instanceof PointerType)) {
-                int reg1 = getOperandReg(nameLeft);
-                int reg2 = findReg();
-                if (nameRight.charAt(0) == '%') {
-                    int pos = -1;
-                    if (mipsSymbolTable.containsMipsSymbol(nameRight)) {
-                        MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(nameRight);
-                        pos = mipsSymbol.getOffset();
-                        Lw lw = new Lw(reg2, 29, pos);
-                        mipsBasicBlock.addInstruction(lw);
-                    } else {
-                        System.out.println("should not happen,cannot find operand");
-                    }
-                    Sw sw = new Sw(reg1, reg2, 0);
-                    mipsBasicBlock.addInstruction(sw);
-                    register.freeRegister(reg1);
-                    register.freeRegister(reg2);
-                } else if (nameRight.charAt(0) == '@') {
-                    System.out.println("weired");
-                }
-            } else {
-                if (mipsSymbolTable.containsMipsSymbol(nameRight)) {
-                    MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(nameRight);
+                    MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(nameLeft);
                     int pos = mipsSymbol.getOffset();
-                    int reg1 = getOperandReg(nameLeft);
-                    Sw sw = new Sw(reg1,29,pos);
-                    mipsBasicBlock.addInstruction(sw);
-                } else {
-                    System.out.println("should not happen,cannot find operand");
+                    Lw lw = new Lw(reg, 29, pos);
+                    mipsBasicBlock.addInstruction(lw);
                 }
             }
+            Sw sw = new Sw(reg, nameRight.substring(1));
+            mipsBasicBlock.addInstruction(sw);
+        } else {
+            int reg1 = 26;
+            int reg2 = 27;
+            if (isConstant(left.getName())) {
+                Li li = new Li(reg1,Integer.parseInt(left.getName()));
+                mipsBasicBlock.addInstruction(li);
+            } else {
+                if (isAllocated(left)) {
+                    reg1 = getReg(left);
+                } else {
+                    findFromMem(left.getName(), reg1);
+                }
+            }
+            if (isAllocated(right)) {
+                reg2 = getReg(right);
+            } else {
+                findFromMem(right.getName(),reg2);
+            }
+            Sw sw = new Sw(reg1,reg2,0);
+            mipsBasicBlock.addInstruction(sw);
         }
     }
 
@@ -452,79 +451,121 @@ public class MipsBasicBlockBuilder {
         Getelementptr getelementptr = (Getelementptr) instruction;
         String name = getelementptr.getName();
         MipsSymbol mipsSymbol; //相对偏移的位置存入栈的位置
-        if (mipsSymbolTable.containsMipsSymbol(name)) {
-            mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
-        } else {
-            int pos = offset;
-            offset = offset - 4;
-            mipsSymbol = new MipsSymbol(name,pos,instruction);
-            mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
-        }
+        int regK1 = 27;
+        int reg = 26; //结果
         if (getelementptr.getDim() == 1) {
-            String column = getelementptr.getOffsetColumn();
-            int reg = getOperandReg(column);
-            Sll sll = new Sll(reg,reg,2);
-            mipsBasicBlock.addInstruction(sll);
-            String base = getelementptr.getBaseName();
-            int reg1 = findReg();
-            if (base.charAt(0) == '%') {
-                if (mipsSymbolTable.containsMipsSymbol(base)) {
-                    MipsSymbol mipsSymbol1 = mipsSymbolTable.getMipsSymbol(base);
-                    int pos = mipsSymbol1.getOffset(); //取出数组首地址的存放位置
-                    Lw lw = new Lw(reg1,29,pos);
-                    mipsBasicBlock.addInstruction(lw);
-                    MipsCalculate mc = new MipsCalculate("addu",reg,reg1,reg);
-                    mipsBasicBlock.addInstruction(mc);
-                }
+            LlvmIrValue column = getelementptr.getOffsetColumn();
+            if (isConstant(column.getName())) {
+                Li li = new Li(reg,Integer.parseInt(column.getName())); //reg1存入数据
+                mipsBasicBlock.addInstruction(li);
             } else {
-                La la = new La(reg1,base.substring(1));
-                mipsBasicBlock.addInstruction(la);
-                MipsCalculate mipsCalculate1 = new MipsCalculate("addu",reg,reg1,reg);
-                mipsBasicBlock.addInstruction(mipsCalculate1);
+                if (isAllocated(column)) {
+                    reg = varReg.get(column);
+                } else {
+                    findFromMem(column.getName(), reg);
+                }
             }
-            Sw sw = new Sw(reg,29, mipsSymbol.getOffset());
-            mipsBasicBlock.addInstruction(sw);
-            register.freeRegister(reg);
-            register.freeRegister(reg1);
+            //此时reg1的值为column，
+            Sll sll = new Sll(regK1,reg,2); //把结果存入27
+            mipsBasicBlock.addInstruction(sll);
+            LlvmIrValue base = getelementptr.getBase();
+            reg = 26; //reg复位
+            if (isAllocated(base)) { //base在26或reg
+                reg = getReg(base);
+            } else {
+                if (base.getName().charAt(0) == '%') {
+                    findFromMem(base.getName(), reg);
+                } else {
+                    La la = new La(reg,base.getName().substring(1));
+                    mipsBasicBlock.addInstruction(la);
+                }
+            }
+            if (isAllocated(instruction)) {
+                int ans = getReg(instruction);
+                MipsCalculate mc = new MipsCalculate("addu",reg,regK1,ans);
+                mipsBasicBlock.addInstruction(mc);
+            } else {
+                MipsCalculate mc = new MipsCalculate("addu",reg,regK1,regK1);
+                mipsBasicBlock.addInstruction(mc);
+                if (name.charAt(0) == '%') {
+                    if (mipsSymbolTable.containsMipsSymbol(name)) {
+                        mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
+                    } else {
+                        int pos = offset;
+                        offset = offset - 4;
+                        mipsSymbol = new MipsSymbol(name,pos,instruction);
+                        mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
+                    }
+                    int pos = mipsSymbol.getOffset();
+                    Sw sw = new Sw(regK1,29,pos);
+                    mipsBasicBlock.addInstruction(sw);
+                } else {
+                    System.out.println("gete error!");
+                }
+            }
         } else if (getelementptr.getDim() == 2) {
-            String row = getelementptr.getOffsetRow();
-            int reg1 = getOperandReg(row);
-            int reg2 = findReg();
-            int reg3;
-            Li li = new Li(reg2, getelementptr.getColumnNum());
+            LlvmIrValue row = getelementptr.getOffsetRow();
+            Li li = new Li(regK1, getelementptr.getColumnNum()); //数字
             mipsBasicBlock.addInstruction(li);
-            String column = getelementptr.getOffsetColumn();
-            reg3 = getOperandReg(column);
-            MipsCalculate mipsCalculate = new MipsCalculate("mul", reg2, reg1, reg2);
-            mipsBasicBlock.addInstruction(mipsCalculate);
-            mipsCalculate = new MipsCalculate("addu", reg2, reg3, reg3);
-            mipsBasicBlock.addInstruction(mipsCalculate);
-            Sll sll = new Sll(reg3, reg3, 2);
-            mipsBasicBlock.addInstruction(sll);
-            String base = getelementptr.getBaseName();
-            int reg4 = findReg();
-            if (base.charAt(0) == '%') {
-                if (mipsSymbolTable.containsMipsSymbol(base)) {
-                    MipsSymbol mipsSymbol1 = mipsSymbolTable.getMipsSymbol(base);
-                    int pos = mipsSymbol1.getOffset();
-                    Lw lw = new Lw(reg4,29,pos);
-                    mipsBasicBlock.addInstruction(lw);
-                    MipsCalculate mc = new MipsCalculate("addu",reg4,reg3,reg3);
-                    mipsBasicBlock.addInstruction(mc);
-                }
+            if (isConstant(row.getName())) {
+                li = new Li(reg,Integer.parseInt(row.getName()));
+                mipsBasicBlock.addInstruction(li);
             } else {
-                La la = new La(reg4,base.substring(1));
-                mipsBasicBlock.addInstruction(la);
-                MipsCalculate mipsCalculate1 = new MipsCalculate("addu",reg3,reg4,reg3);
-                mipsBasicBlock.addInstruction(mipsCalculate1);
+                if (isAllocated(row)) {
+                    reg = getReg(row);
+                } else {
+                    findFromMem(row.getName(), reg);
+                }
             }
-            Sw sw = new Sw(reg3, 29, mipsSymbol.getOffset());
-            mipsBasicBlock.addInstruction(sw);
-            register.freeRegister(reg1);
-            register.freeRegister(reg2);
-            register.freeRegister(reg3);
-            register.freeRegister(reg4);
-            mipsSymbolTable.addMipsSymbol(getelementptr.getName(),mipsSymbol);
+            MipsCalculate mipsCalculate = new MipsCalculate("mul", reg, regK1, regK1); //regK1是结果
+            mipsBasicBlock.addInstruction(mipsCalculate);
+            LlvmIrValue column = getelementptr.getOffsetColumn();
+            reg = 26; //reg复位至26
+            if (isConstant(column.getName())) {
+                li = new Li(reg,Integer.parseInt(column.getName()));
+                mipsBasicBlock.addInstruction(li);
+            } else {
+                if (isAllocated(column)) {
+                    reg = getReg(column);
+                } else {
+                    findFromMem(column.getName(), reg);
+                }
+            }
+            mipsCalculate = new MipsCalculate("addu", reg, regK1, regK1);
+            mipsBasicBlock.addInstruction(mipsCalculate);
+            Sll sll = new Sll(regK1, regK1, 2);
+            mipsBasicBlock.addInstruction(sll);
+            LlvmIrValue base = getelementptr.getBase();
+            reg = 26; //reg复位，结果存储于27
+            if (isAllocated(base)) {
+                reg = getReg(base);
+            } else {
+                if (base.getName().charAt(0) == '%') {
+                    findFromMem(base.getName(), reg);
+                } else {
+                    La la = new La(reg,base.getName().substring(1));
+                    mipsBasicBlock.addInstruction(la);
+                }
+            }
+            if (isAllocated(instruction)) {
+                int ans = getReg(instruction);
+                mipsCalculate = new MipsCalculate("addu", reg, regK1, ans);
+                mipsBasicBlock.addInstruction(mipsCalculate);
+            } else {
+                mipsCalculate = new MipsCalculate("addu", reg, regK1, regK1);
+                mipsBasicBlock.addInstruction(mipsCalculate);
+                if (mipsSymbolTable.containsMipsSymbol(name)) {
+                    mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
+                } else {
+                    int pos = offset;
+                    offset = offset - 4;
+                    mipsSymbol = new MipsSymbol(name,pos,instruction);
+                    mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
+                }
+                int pos = mipsSymbol.getOffset();
+                Sw sw = new Sw(regK1,29,pos);
+                mipsBasicBlock.addInstruction(sw);
+            }
         }
      }
 
@@ -532,59 +573,62 @@ public class MipsBasicBlockBuilder {
         String name = instruction.getName();
         LlvmIrValue right = ((Load) instruction).getLlvmIrValue();
         if (right.getDim() == 0) {
-            int reg = getOperandReg(right.getName()); //从哪里load，一定已经声明，ok
-            if (name.charAt(0) == '%') {
-                if (mipsSymbolTable.containsMipsSymbol(name)) {
-                    int pos = mipsSymbolTable.getMipsSymbol(name).getOffset();
-                    Sw sw = new Sw(reg, 29, pos);
-                    mipsBasicBlock.addInstruction(sw);
-                } else {
-                    int pos = offset;
-                    offset = offset - 4;
-                    MipsSymbol mipsSymbol = new MipsSymbol(name, pos, instruction);
-                    mipsSymbolTable.addMipsSymbol(name, mipsSymbol);
-                    Sw sw = new Sw(reg, 29, pos);
-                    mipsBasicBlock.addInstruction(sw);
-                }
-            } else if (name.charAt(0) == '@') {
-                Sw sw = new Sw(reg, name.substring(1));
-                mipsBasicBlock.addInstruction(sw);
+            int reg = 26;
+            if (isAllocated(instruction)) {
+                reg = getReg(instruction);
+            }
+           if (right.getName().charAt(0) == '@') {
+                Lw lw = new Lw(reg,right.getName().substring(1));
+                mipsBasicBlock.addInstruction(lw);
             } else {
                 System.out.println("load wrong");
             }
-            register.freeRegister(reg);
+            if (!isAllocated(instruction)) {
+                MipsSymbol mipsSymbol = new MipsSymbol(name,offset,instruction);
+                mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
+                Sw sw = new Sw(reg,29,offset);
+                offset = offset - 4;
+                mipsBasicBlock.addInstruction(sw);
+            }
         } else {
             String rightName = right.getName();
-            if (rightName.charAt(0) != '%') {
-                System.out.println("weired");
+            int reg = 26;
+            if (isAllocated(right)) {
+                reg = getReg(right);
+            } else {
+                findFromMem(rightName,reg);
             }
-            int reg = getOperandReg(rightName);
-
             //MipsSymbol rightSymbol = mipsSymbolTable.getMipsSymbol(rightName);
-            if (!(instruction.getType() instanceof PointerType)) {
+            /*if (!(instruction.getType() instanceof PointerType)) { //???
                 Lw lw = new Lw(reg,reg,0);
                 mipsBasicBlock.addInstruction(lw);
-            }
-            if (name.charAt(0) == '%') {
-                if (mipsSymbolTable.containsMipsSymbol(name)) {
-                    int pos = mipsSymbolTable.getMipsSymbol(name).getOffset();
-                    Sw sw = new Sw(reg, 29, pos);
-                    mipsBasicBlock.addInstruction(sw);
-                } else {
-                    int pos = offset;
-                    offset = offset - 4;
-                    MipsSymbol mipsSymbol = new MipsSymbol(name, pos, instruction);
-                    mipsSymbolTable.addMipsSymbol(name, mipsSymbol);
-                    Sw sw = new Sw(reg, 29, pos);
+            }*/
+            if (isAllocated(instruction)) {
+                int reg1 = getReg(instruction);
+                Lw lw = new Lw(reg1,reg,0);
+                mipsBasicBlock.addInstruction(lw);
+            } else {
+                int reg1 = 27;
+                Lw lw = new Lw(reg1,reg,0);
+                mipsBasicBlock.addInstruction(lw);
+                if (name.charAt(0) == '%') {
+                    if (mipsSymbolTable.containsMipsSymbol(name)) {
+                        int pos = mipsSymbolTable.getMipsSymbol(name).getOffset();
+                        Sw sw = new Sw(reg1, 29, pos);
+                        mipsBasicBlock.addInstruction(sw);
+                    } else {
+                        int pos = offset;
+                        offset = offset - 4;
+                        MipsSymbol mipsSymbol = new MipsSymbol(name, pos, instruction);
+                        mipsSymbolTable.addMipsSymbol(name, mipsSymbol);
+                        Sw sw = new Sw(reg1, 29, pos);
+                        mipsBasicBlock.addInstruction(sw);
+                    }
+                } else if (name.charAt(0) == '@') {
+                    Sw sw = new Sw(reg1, name.substring(1));
                     mipsBasicBlock.addInstruction(sw);
                 }
-            } else if (name.charAt(0) == '@') {
-                Sw sw = new Sw(reg, name.substring(1));
-                mipsBasicBlock.addInstruction(sw);
-            } else {
-                System.out.println("load wrong");
             }
-            register.freeRegister(reg);
         }
     }
 
@@ -597,7 +641,17 @@ public class MipsBasicBlockBuilder {
         } else {
             LlvmIrValue retValue = ret.getRight();
             String name = retValue.getName();
-            int reg = getOperandReg(name); //返回值，一定已存入符号表，ok
+            int reg = 26;
+            if (!isConstant(retValue.getName())) {
+                if (isAllocated(retValue)) {
+                    reg = getReg(retValue);
+                } else {
+                    findFromMem(name, 26);
+                }
+            } else {
+                Li li = new Li(reg,Integer.parseInt(name));
+                mipsBasicBlock.addInstruction(li);
+            }
             Move move = new Move(2,reg);
             mipsBasicBlock.addInstruction(move);
             if (isMain) {
@@ -609,7 +663,6 @@ public class MipsBasicBlockBuilder {
                 Jr jr = new Jr(31);
                 mipsBasicBlock.addInstruction(jr);
             }
-            register.freeRegister(reg);
         }
      }
 
@@ -618,62 +671,101 @@ public class MipsBasicBlockBuilder {
          if (call.getMark() == 2) {
              LlvmIrValue llvmIrValue = call.getOp();
              String name = llvmIrValue.getName();
-             int reg = getOperandReg(name); //肯定在符号表中
-             if (register.canUseNow(4)) {
-                 Move move = new Move(4,reg);
-                 mipsBasicBlock.addInstruction(move);
-                 Li li = new Li(2,1);
-                 mipsBasicBlock.addInstruction(li);
-                 Syscall syscall = new Syscall();
-                 mipsBasicBlock.addInstruction(syscall);
+             int reg = 26;
+             if (isConstant(name)) {
+                Li li = new Li(26,Integer.parseInt(name));
+                mipsBasicBlock.addInstruction(li);
              } else {
-                 System.out.println("a0 should not be occupied when call putInt");
+                 if (isAllocated(llvmIrValue)) {
+                     reg = getReg(llvmIrValue);
+                 } else {
+                     findFromMem(name, reg);
+                 }
              }
-             register.freeRegister(reg);
+             Move move = new Move(4,reg);
+             mipsBasicBlock.addInstruction(move);
+             Li li = new Li(2,1);
+             mipsBasicBlock.addInstruction(li);
+             Syscall syscall = new Syscall();
+             mipsBasicBlock.addInstruction(syscall);
          } else if (call.getMark() == 1) {
              Li li = new Li(2,5);
              mipsBasicBlock.addInstruction(li);
              Syscall syscall = new Syscall();
              mipsBasicBlock.addInstruction(syscall);//v0 已沦陷
              String name = call.getName();
-             if (name.charAt(0) == '%') {
-                 if (mipsSymbolTable.containsMipsSymbol(name)) {
-                     MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
-                     int pos = mipsSymbol.getOffset();
-                     Sw sw = new Sw(2,29,pos);
-                     mipsBasicBlock.addInstruction(sw);
+             if (!isConstant(name)) {
+                 if (isAllocated(call)) {
+                     Move move = new Move(getReg(call),2);
+                     mipsBasicBlock.addInstruction(move);
                  } else {
-                     int pos = offset;
-                     MipsSymbol mipsSymbol = new MipsSymbol(name,offset,call);
-                     offset = offset - 4;
-                     mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
-                     Sw sw = new Sw(2,29,pos);
-                     mipsBasicBlock.addInstruction(sw);
+                     if (name.charAt(0) == '%') {
+                         int pos;
+                         if (mipsSymbolTable.containsMipsSymbol(name)) {
+                             MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
+                             pos = mipsSymbol.getOffset();
+                         } else {
+                             pos = offset;
+                             offset = offset -4;
+                             MipsSymbol mipsSymbol = new MipsSymbol(name,pos,call);
+                             mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
+                         }
+                         Sw sw = new Sw(2, 29, pos);
+                         mipsBasicBlock.addInstruction(sw);
+                     } else {
+                         Sw sw = new Sw(2,name);
+                         mipsBasicBlock.addInstruction(sw);
+                     }
                  }
-             } else if (name.charAt(0) == '@') {
-                 Sw sw = new Sw(2,name);
-                 mipsBasicBlock.addInstruction(sw);
              } else {
                  System.out.println("some problems when call getInt");
              }
          } else if (call.getMark() == 0) {
              //保存现场（暂时没啥好存的）直接内存存储，进入函数后
-             ArrayList<LlvmIrValue> params = call.getParams(); //params.size() == 0,无参数;
-             for (int i = params.size() - 1;i >= 0;i--) {
-                 LlvmIrValue param = params.get(i);
-                 String name = param.getName();
-                 int reg = getOperandReg(name);
-                 Sw sw = new Sw(reg,29,offset); //内存的位置存进去
-                 offset = offset - 4;
+             HashSet<Integer> temp = new HashSet<>(varReg.values());
+             HashMap<Integer,Integer> reflection = new HashMap<>();
+             ArrayList<Integer> uses = new ArrayList<>(temp);
+             for (int i = 0;i < uses.size();i++) { //保存寄存器
+                 Sw sw = new Sw(uses.get(i),29,offset);
                  mipsBasicBlock.addInstruction(sw);
-                 register.freeRegister(reg);
+                 reflection.put(uses.get(i), offset);
+                 offset = offset - 4;
              }
+             ArrayList<LlvmIrValue> params = call.getParams();
+             for (int i = params.size() - 1;i >= 0;i--) { //参数放入a0或内存
+                 int reg = 26;
+                 int a1 = 5;
+                 if (!isConstant(params.get(i).getName())) {
+                     if (isAllocated(params.get(i))) {
+                         reg = getReg(params.get(i));
+                     } else {
+                         findFromMem(params.get(i).getName(), reg);
+                     }
+                 } else {
+                     Li li = new Li(reg,Integer.parseInt(params.get(i).getName()));
+                     mipsBasicBlock.addInstruction(li);
+                 }
+                 if (i <= 2) {
+                     if (reflection.containsKey(reg)) {
+                         Lw lw = new Lw(a1 + i, 29, reflection.get(reg));
+                         mipsBasicBlock.addInstruction(lw);
+                     } else {
+                         Move move = new Move(a1+i,reg);
+                         mipsBasicBlock.addInstruction(move);
+                     }
+                 } else {
+                     Sw sw = new Sw(reg, 29, offset); //内存的位置存进去
+                     offset = offset - 4;
+                     mipsBasicBlock.addInstruction(sw);
+                 }
+             }
+
              Sw sw = new Sw(31,29,offset); //存入ra
              offset = offset - 4;
              mipsBasicBlock.addInstruction(sw);
              Addi addi = new Addi(29,29,offset); //函数的sp从此开始
              mipsBasicBlock.addInstruction(addi);
-             Addi addi1 = new Addi(30,30,fp_offset);
+             Addi addi1 = new Addi(30,30,fp_offset); //函数的fp
              mipsBasicBlock.addInstruction(addi1);
 
              Jal jal = new Jal(call.getFuncValue().getName().substring(1));
@@ -686,31 +778,89 @@ public class MipsBasicBlockBuilder {
              offset = offset + 4; //ra出栈
              Lw lw = new Lw(31,29,offset);
              mipsBasicBlock.addInstruction(lw);
-             offset = offset + params.size() * 4;//传参用的是栈，参数没用了
+             if (params.size() > 3) {
+                 offset = offset + (params.size() - 3) * 4;//传参用的是栈，参数没用了
+             }
+             for (int i = uses.size() - 1;i >= 0;i--) { //恢复
+                 offset = offset + 4;
+                 Lw lw1 = new Lw(uses.get(i),29,offset);
+                 mipsBasicBlock.addInstruction(lw1);
+             }
+
              if (call.getName().length() > 0) { //有返回值需要存储
                  String name = call.getName();
-                 if (name.charAt(0) == '%') {
-                     if (mipsSymbolTable.containsMipsSymbol(name)) {
-                        MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
-                        int pos = mipsSymbol.getOffset();
-                        Sw sw1 = new Sw(2,29,pos);
-                        mipsBasicBlock.addInstruction(sw1);
+                 if (isAllocated(call)) {
+                     int reg = getReg(call);
+                     Move move = new Move(reg,2);
+                     mipsBasicBlock.addInstruction(move);
+                 }  else {
+                     if (name.charAt(0) == '%') {
+                         if (mipsSymbolTable.containsMipsSymbol(name)) {
+                             MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(name);
+                             int pos = mipsSymbol.getOffset();
+                             Sw sw1 = new Sw(2,29,pos);
+                             mipsBasicBlock.addInstruction(sw1);
+                         } else {
+                             int pos = offset;
+                             offset = offset - 4;
+                             MipsSymbol mipsSymbol = new MipsSymbol(name,pos,call);
+                             mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
+                             Sw sw1 = new Sw(2,29,pos);
+                             mipsBasicBlock.addInstruction(sw1);
+                         }
                      } else {
-                         int pos = offset;
-                         offset = offset - 4;
-                         MipsSymbol mipsSymbol = new MipsSymbol(name,pos,call);
-                         mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
-                         Sw sw1 = new Sw(2,29,pos);
+                         Sw sw1 = new Sw(2,name);
                          mipsBasicBlock.addInstruction(sw1);
                      }
-                 } else if (name.charAt(0) == '@') {
-                     Sw sw1 = new Sw(2,name);
-                     mipsBasicBlock.addInstruction(sw1);
                  }
              }
-             register.freeRegister(2);
          } else {
              System.out.println("check function call when generating mips");
          }
      }
+
+     public void dealMidMove(LlvmIrValue llvmIrValue) {
+        MidMove midMove = (MidMove) llvmIrValue;
+        LlvmIrValue src = midMove.getSrc();
+        LlvmIrValue dst = midMove.getDst();
+        int reg1 = 26;
+        int reg2 = 27;
+        int flag = 0;
+        if (isConstant(src.getName())) { //如果是
+            flag = 1;
+        } else {
+            if (isAllocated(src)) {
+                reg2 = getReg(src);
+            } else {
+                findFromMem(src.getName(), reg2);
+            }
+        }
+         if (isAllocated(dst)) {
+             reg1 = getReg(dst);
+             if (flag == 0) {
+                 Move move = new Move(reg1,reg2);
+                 mipsBasicBlock.addInstruction(move);
+             } else {
+                 Li li = new Li(reg1,Integer.parseInt(src.getName()));
+                 mipsBasicBlock.addInstruction(li);
+             }
+         } else {
+             int pos;
+             if (mipsSymbolTable.containsMipsSymbol(dst.getName())) {
+                 MipsSymbol mipsSymbol = mipsSymbolTable.getMipsSymbol(dst.getName());
+                 pos = mipsSymbol.getOffset();
+             } else {
+                 pos = offset;
+                 offset = offset - 4;
+                 MipsSymbol mipsSymbol = new MipsSymbol(dst.getName(),pos,dst);
+                 mipsSymbolTable.addMipsSymbol(dst.getName(), mipsSymbol);
+             }
+             if (flag != 0) {
+                 Li li = new Li(reg2,Integer.parseInt(src.getName()));
+                 mipsBasicBlock.addInstruction(li);
+             }
+             Sw sw = new Sw(reg2, 29, pos);
+             mipsBasicBlock.addInstruction(sw);
+         }
+    }
 }

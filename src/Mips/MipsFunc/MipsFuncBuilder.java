@@ -16,27 +16,29 @@ public class MipsFuncBuilder {
     private Func func;
     private StringCnt stringCnt;
     private MipsSymbolTable mipsSymbolTable;
-    private HashMap<String,Integer> labelMatch;
-    private GlobalLabelCnt gbc;
 
 
-    public MipsFuncBuilder(Func func,StringCnt stringCnt,GlobalLabelCnt gbc) {
+    public MipsFuncBuilder(Func func,StringCnt stringCnt) {
         this.func = func;
         this.stringCnt = stringCnt;
         mipsSymbolTable = new MipsSymbolTable();
-        labelMatch = new HashMap<>();
-        this.gbc = gbc;
         setParams();
     }
 
     public void setParams() {
         ArrayList<LlvmIrValue> params = func.getParams();
         int temp = 8; //第一个参数，4 是 $ra，0 是当前函数的起始位置。
+        int reg = 5; //$a1
         for (int i = 0;i < params.size();i++) {
-            LlvmIrValue param = params.get(i);
-            MipsSymbol mipsSymbol = new MipsSymbol("%v_" + i,temp,param);
-            temp = temp + 4;
-            mipsSymbolTable.addMipsSymbol("%v_" + i,mipsSymbol);
+            if (i <= 2) {
+                func.getVarReg().put(params.get(i),reg);
+                reg = reg + 1;
+            } else {
+                LlvmIrValue param = params.get(i);
+                MipsSymbol mipsSymbol = new MipsSymbol(param.getName(), temp, param);
+                temp = temp + 4;
+                mipsSymbolTable.addMipsSymbol(param.getName(), mipsSymbol);
+            }
         }
     }
 
@@ -57,7 +59,7 @@ public class MipsFuncBuilder {
         for (BasicBlock basicBlock : basicBlocks) {
             if (!basicBlock.getName().equals("-1")) {
                 MipsBasicBlockBuilder mipsBasicBlockBuilder = new MipsBasicBlockBuilder(basicBlock, stringCnt, mipsSymbolTable,
-                        register, isMain,offset,fp_offset,labelMatch,gbc);
+                        register, isMain,offset,fp_offset,func.getVarReg());
                 mipsFunc.addMipsBasicBlock(mipsBasicBlockBuilder.generateMipsBasicBlock(strings));
                 offset = mipsBasicBlockBuilder.getOffset();
                 fp_offset = mipsBasicBlockBuilder.getFpOffset();

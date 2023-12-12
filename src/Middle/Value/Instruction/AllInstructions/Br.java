@@ -3,6 +3,7 @@ package Middle.Value.Instruction.AllInstructions;
 import Middle.LlvmIrValue;
 import Middle.Type.ValueType;
 import Middle.Value.Instruction.Instruction;
+import Mips.MipsInstruction.Lw;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -66,8 +67,8 @@ public class Br extends Instruction {
         return jump.getName();
     }
 
-    public String getCondName() {
-        return cond.getName();
+    public LlvmIrValue getCond() {
+        return cond;
     }
 
     @Override

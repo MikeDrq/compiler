@@ -1,6 +1,7 @@
 package Middle.Value.BasicBlock;
 
 import Middle.LlvmIrValue;
+import Middle.Type.ArrayType;
 import Middle.Type.ValueType;
 import Middle.Value.Instruction.AllInstructions.*;
 import Middle.Value.Instruction.Instruction;

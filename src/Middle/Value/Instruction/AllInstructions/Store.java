@@ -9,7 +9,6 @@ import java.util.ArrayList;
 public class Store extends Instruction  {
     private LlvmIrValue leftValue;
     private LlvmIrValue rightValue;
-    private Alloca alloca;
     public Store(String name,ValueType valueType,LlvmIrValue leftValue,LlvmIrValue rightValue) { // store leftValue rightValue
         super(name,valueType);
         this.leftValue = leftValue;

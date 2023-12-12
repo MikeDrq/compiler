@@ -18,7 +18,7 @@ public class Sll extends MipsInstruction {
     public String mipsOutput() {
         StringBuilder sb = new StringBuilder();
         Register register = new Register();
-        sb.append("sll ").append(register.getRegister(reg2)).append(", ").append(register.getRegister(reg1)).append(", ").append(imme).append("\n");
+        sb.append("sll ").append(register.getRegister(reg1)).append(", ").append(register.getRegister(reg2)).append(", ").append(imme).append("\n");
         return sb.toString();
     }
 }

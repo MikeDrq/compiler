@@ -94,4 +94,8 @@ public class Func extends LlvmIrValue {
     public void addVarReg(HashMap<LlvmIrValue,Integer> varReg) {
         this.varReg = varReg;
     }
+
+    public HashMap<LlvmIrValue, Integer> getVarReg() {
+        return varReg;
+    }
 }

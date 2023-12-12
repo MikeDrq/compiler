@@ -61,16 +61,16 @@ public class Getelementptr extends Instruction {
         return this.dim;
     }
 
-    public String getOffsetColumn() {
-        return offset_column_value.getName();
+    public LlvmIrValue getOffsetColumn() {
+        return offset_column_value;
     }
 
-    public String getBaseName() {
-        return base.getName();
+    public LlvmIrValue getBase() {
+        return base;
     }
 
-    public String getOffsetRow() {
-        return offset_row_value.getName();
+    public LlvmIrValue getOffsetRow() {
+        return offset_row_value;
     }
 
     public int getRowNum() {

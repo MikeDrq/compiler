@@ -125,13 +125,13 @@ public class Call extends Instruction {
         return sb.toString();
     }
 
-    @Override
+    /*@Override
     public LlvmIrValue getDefine() {
         if (type == 0 || type == 1) {
             return this;
         }
         return null;
-    }
+    }*/
 
     @Override
     public ArrayList<LlvmIrValue> getOperand() {

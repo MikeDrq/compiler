@@ -37,16 +37,4 @@ public class Register {
     public String getRegister(int num) {
         return registers.get(num);
     }
-
-    public Boolean canUseNow(int num) {
-        return canUse.get(num);
-    }
-
-    public void useRegister(int num) {
-        canUse.put(num,false);
-    }
-
-    public void freeRegister(int num) {
-        canUse.put(num,true);
-    }
 }

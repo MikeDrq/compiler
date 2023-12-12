@@ -4,6 +4,7 @@ import Middle.LlvmIrModule;
 import Middle.LlvmIrValue;
 import Middle.Value.BasicBlock.BasicBlock;
 import Middle.Value.Func.Func;
+import Middle.Value.Instruction.AllInstructions.Phi;
 import Middle.Value.Instruction.Instruction;
 import Mips.Register;
 
@@ -39,6 +40,14 @@ public class RegAllocate {
             ArrayList<BasicBlock> basicBlocks = func.getBasicBlocks();
             BasicBlock first = basicBlocks.get(0);
             allocateReg(first);
+            Register r = new Register();
+            System.out.println(func.getName());
+            for (LlvmIrValue ins : varReg.keySet()) {
+                if (ins.getName().equals("")) {
+                    System.out.println(((Instruction) ins).midOutput());
+                }
+                System.out.println(ins.getName() + " -> " + r.getRegister(varReg.get(ins)));
+            }
         }
      }
 
@@ -57,13 +66,13 @@ public class RegAllocate {
         for (BasicBlock basicBlock : basicBlocks) {
             LinkedList<Instruction> instructions = basicBlock.getInstructions();
             for (Instruction instruction : instructions) {
-                if (instruction.getDefine() != null) {
-                    LlvmIrValue define = instruction.getDefine();
-                    basicBlock.setDef(define);
-                }
                 ArrayList<LlvmIrValue> uses = instruction.getOperand();
                 for (LlvmIrValue use : uses) {
                     basicBlock.setUse(use);
+                }
+                if (instruction.getDefine() != null) {
+                    LlvmIrValue define = instruction.getDefine();
+                    basicBlock.setDef(define);
                 }
             }
         }
@@ -139,6 +148,14 @@ public class RegAllocate {
      }
 
      public void allocateReg(BasicBlock cur) {
+        for (LlvmIrValue llvmIrValue : varReg.keySet()) {
+            if (llvmIrValue.getName().equals("%v_61")) {
+                System.out.println(cur.getName() + " " + llvmIrValue.getName() + " " + varReg.get(llvmIrValue));
+            }
+        }
+        if (cur.getName().equals("3")) {
+            System.out.println("great!");
+        }
         HashMap<LlvmIrValue,Integer> lastPos = new HashMap<>();
         LinkedList<Instruction> instructions = cur.getInstructions();
         ArrayList<LlvmIrValue> curDef = new ArrayList<>();
@@ -155,11 +172,13 @@ public class RegAllocate {
         for (int i = 0;i < instructions.size();i++) {
             Instruction curInstr = instructions.get(i);
             ArrayList<LlvmIrValue> operands = curInstr.getOperand();
-            for (LlvmIrValue operand : operands) {
-                if (lastPos.containsKey(operand) && lastPos.get(operand) == i && !out.get(cur.getName()).contains(operand)) {
-                    //本块内不会使用,且不在out集中，可以暂时释放
-                    regVar.remove(varReg.get(operand));
-                    tempRelease.add(operand);
+            if (!(curInstr instanceof Phi)) {
+                for (LlvmIrValue operand : operands) {
+                    if (lastPos.containsKey(operand) && lastPos.get(operand) == i && !out.get(cur.getName()).contains(operand) && varReg.containsKey(operand)) {
+                        //本块内不会使用,且不在out集中，可以暂时释放
+                        regVar.remove(varReg.get(operand));
+                        tempRelease.add(operand);
+                    }
                 }
             }
 
@@ -191,7 +210,6 @@ public class RegAllocate {
             }
 
             allocateReg(b);
-
             //恢复被释放的寄存器
             for (Integer num : store.keySet()) {
                 regVar.put(num,store.get(num));

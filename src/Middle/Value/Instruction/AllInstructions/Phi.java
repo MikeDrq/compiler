@@ -6,6 +6,7 @@ import Middle.Type.ValueType;
 import Middle.Value.Instruction.Instruction;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 public class Phi extends Instruction {
     private ArrayList<LlvmIrValue> values;
@@ -34,6 +35,27 @@ public class Phi extends Instruction {
 
     public String getChangeName() {
         return this.changeName;
+    }
+
+    @Override
+    public LlvmIrValue getDefine() {
+        return this;
+    }
+
+    @Override
+    public ArrayList<LlvmIrValue> getOperand() {
+        return values;
+    }
+
+    @Override
+    public void change(String name,LlvmIrValue l) {
+        ListIterator<LlvmIrValue> iterator = values.listIterator();
+        while(iterator.hasNext()) {
+            LlvmIrValue value = iterator.next();
+            if (value.getName().equals(name)) {
+                iterator.set(l);
+            }
+        }
     }
 
     @Override

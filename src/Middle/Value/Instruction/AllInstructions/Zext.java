@@ -17,6 +17,10 @@ public class Zext extends Instruction {
         return value.getName();
     }
 
+    public LlvmIrValue getValue() {
+        return this.value;
+    }
+
     @Override
     public LlvmIrValue getDefine() {
         return this;

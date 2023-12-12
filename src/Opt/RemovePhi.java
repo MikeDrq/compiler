@@ -11,15 +11,13 @@ import Middle.Value.Func.FuncCnt;
 import Middle.Value.Instruction.AllInstructions.*;
 import Middle.Value.Instruction.Instruction;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 public class RemovePhi {
     private LlvmIrModule llvmIrModule;
     private BasicBlockCnt basicBlockCnt;
     private HashMap<String,BasicBlock> basicBlockIndex;
+    private HashMap<LlvmIrValue,Integer> varReg;
 
     public RemovePhi(LlvmIrModule llvmIrModule,BasicBlockCnt basicBlockCnt) {
         this.llvmIrModule = llvmIrModule;
@@ -29,6 +27,7 @@ public class RemovePhi {
     public void doRemovePhi() {
         ArrayList<Func> funcs = llvmIrModule.getFunctions();
         for (Func func : funcs) {
+            varReg = func.getVarReg();
             insertPC(func);
             removePC(func);
         }
@@ -90,7 +89,7 @@ public class RemovePhi {
                         ArrayList<LlvmIrValue> values = ((Phi) instruction).getValues();
                         for (int j = 0;j < sources.size();j++) {
                             if (sources.get(j).getName().equals(orgBelong)) {
-                                pc.addValue(instruction,values.get(i));
+                                pc.addValue(instruction,values.get(j));
                                 break;
                             }
                         }
@@ -110,7 +109,6 @@ public class RemovePhi {
     private void complexInsert(BasicBlock prevBb,BasicBlock curBb,Pc pc,Func func) {
         LinkedList<Instruction> instructions = prevBb.getInstructions();
         Instruction lastIns = instructions.getLast();
-        System.out.println(lastIns.midOutput());
         if (!(lastIns instanceof Br)) {
             System.out.println("error,should be br");
         } else {
@@ -139,16 +137,13 @@ public class RemovePhi {
             //修改prev，next
             ArrayList<String> next = new ArrayList<>();
             ArrayList<String> prev = new ArrayList<>();
-            next.add(jump.getName());
+            next.add(jump.getName()); //
             prev.add(prevBb.getName());
             basicBlock.setNext(next);
             basicBlock.setPrev(prev);
-            next = basicBlock.getNext();
-            for (int i = 0;i < next.size();i++) {
-                if (next.get(i).equals(jump.getName())) {
-                    next.set(i,String.valueOf(num));
-                }
-            }
+
+            prevBb.getNext().set(prevBb.getNext().indexOf(next.get(0)),basicBlock.getName());
+
             BasicBlock nextBasicBlock = basicBlockIndex.get(jump.getName());
             prev = nextBasicBlock.getPrev();
             for (int i = 0;i < next.size();i++) {
@@ -179,36 +174,74 @@ public class RemovePhi {
         ArrayList<LlvmIrValue> phis = ((Pc)instruction).getPhis();
         ArrayList<LlvmIrValue> value = ((Pc) instruction).getValues();
         LinkedList<MidMove> temp = new LinkedList<>();
+        HashSet<LlvmIrValue> moveRec = new HashSet<>();
         for (int i = 0;i < value.size();i++) {
             MidMove move = new MidMove("",null,value.get(i),phis.get(i));
             moves.add(move);
         }
         for (int i = 0;i < moves.size();i++) {
             String s = moves.get(i).getDst().getName();
-            int flag = 0;
-            for (int j = i + 1;j < moves.size();j++) {
-                if (moves.get(j).getSrc().getName().equals(s)) {
-                    flag  = 1;
-                    break;
-                }
-            }
-            if (flag == 1) {
-                int num = funcCnt.getCnt();
-                LlvmIrValue llvmIrValue = new LlvmIrValue("%v_" + num,new IntType(num));
-                MidMove move = new MidMove("",null,llvmIrValue,moves.get(i).getDst());
-                temp.add(move);
-                for (MidMove item : moves) {
-                    if (item.getSrc().getName().equals(s)) {
-                        item.setSrc(llvmIrValue);
+            if (!isConstant(s) && !moveRec.contains(moves.get(i).getDst())) {
+                int flag = 0;
+                for (int j = i + 1; j < moves.size(); j++) {
+                    if (moves.get(j).getSrc().getName().equals(s)) {
+                        flag = 1;
+                        break;
                     }
                 }
+                if (flag == 1) {
+                    int num = funcCnt.getCnt();
+                    LlvmIrValue llvmIrValue = new LlvmIrValue("%v_" + num, new IntType(num));
+                    MidMove move = new MidMove("", null, llvmIrValue, moves.get(i).getDst());
+                    temp.add(move);
+                    for (MidMove item : moves) {
+                        if (item.getSrc().getName().equals(s)) {
+                            item.setSrc(llvmIrValue);
+                        }
+                    }
+                }
+                moveRec.add(moves.get(i).getDst());
             }
-
+        }
+        moveRec = new HashSet<>();
+        for(int i = moves.size() - 1;i >=0 ;i --) {
+            String s = moves.get(i).getSrc().getName();
+            if (!isConstant(s) && !moveRec.contains(moves.get(i).getSrc())) {
+                int flag = 0;
+                for (int j = 0;j < i;j++) {
+                    if (varReg != null && varReg.containsKey(moves.get(i).getSrc())) {
+                        if (varReg.get(moves.get(j).getDst()).equals(varReg.get(moves.get(i).getSrc()))) {
+                            flag = 1;
+                            System.out.println("---" + moves.get(j).getDst().getName());
+                            break;
+                        }
+                    }
+                }
+                if (flag == 1) {
+                    int num = funcCnt.getCnt();
+                    LlvmIrValue llvmIrValue = new LlvmIrValue("%v_" + num, new IntType(num));
+                    MidMove move = new MidMove("", null, moves.get(i).getSrc(),llvmIrValue);
+                    temp.add(move);
+                    for (MidMove item : moves) {
+                        if (item.getSrc().getName().equals(moves.get(i).getSrc().getName())) {
+                            item.setSrc(llvmIrValue);
+                        }
+                    }
+                }
+                moveRec.add(moves.get(i));
+            }
         }
         for (MidMove move : temp) {
             moves.addFirst(move);
         }
         return moves;
+    }
+
+    private Boolean isConstant(String name) {
+        if (name.charAt(0) == '%' || name.charAt(0) == '@') {
+            return false;
+        }
+        return true;
     }
 
 }
