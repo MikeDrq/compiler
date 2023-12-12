@@ -75,18 +75,20 @@ label_12:
 %v_43 = add  i32 %v_48, 1
 br label %label_13
 label_13:
+move %v_67, %v_43
 move %v_55, %v_54
 move %v_51, %v_50
-move %v_48, %v_43
+move %v_48, %v_67
 br label %label_3
 label_14:
 %v_45 = add  i32 %v_47, 1
 br label %label_15
 label_15:
+move %v_68, %v_45
 move %v_56, %v_55
 move %v_52, %v_51
 move %v_49, %v_48
-move %v_47, %v_45
+move %v_47, %v_68
 br label %label_1
 label_16:
 ret  i32 %v_56
@@ -258,8 +260,9 @@ label_50:
 br i1 %v_24,label %label_51,label %label_52
 label_51:
 %v_26 = add  i32 %v_46, 1
+move %v_56, %v_26
 move %v_48, %v_49
-move %v_45, %v_26
+move %v_45, %v_56
 br label %label_56
 label_52:
 %v_28 = icmp eq i32 %v_46, 5
@@ -272,8 +275,9 @@ label_54:
 br label %label_55
 label_55:
 %v_34 = add  i32 %v_46, 1
+move %v_57, %v_34
 move %v_48, %v_46
-move %v_45, %v_34
+move %v_45, %v_57
 br label %label_56
 label_56:
 move %v_49, %v_48

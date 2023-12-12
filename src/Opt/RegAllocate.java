@@ -22,7 +22,7 @@ public class RegAllocate {
     public RegAllocate(LlvmIrModule llvmIrModule) {
         this.llvmIrModule = llvmIrModule;
         this.regs = new ArrayList<>();
-        for (int i = 8;i <= 25;i++) {
+        for (int i = 8;i <= 19;i++) { //最大是25
             regs.add(i);
         }
     }
