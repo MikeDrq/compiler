@@ -1,7 +1,6 @@
-const int a[5] = {1,2,3,4,5};
-const int z = 6;
+const int c = 6;
 int main() {
-    const int c = 6;
-    printf("%d",c);
+    int a[c] = {1,2,3};
+    printf("%d",a[0]);
     return 0;
 }

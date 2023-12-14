@@ -582,21 +582,24 @@ public class MipsBasicBlockBuilder {
         MipsSymbol mipsSymbol; //相对偏移的位置存入栈的位置
         int regK1 = 27;
         int reg = 26; //结果
+        int flag;
         if (getelementptr.getDim() == 1) {
             LlvmIrValue column = getelementptr.getOffsetColumn();
             if (isConstant(column.getName())) {
-                Li li = new Li(reg,Integer.parseInt(column.getName())); //reg1存入数据
-                mipsBasicBlock.addInstruction(li);
+                flag = 0;
             } else {
                 if (isAllocated(column)) {
                     reg = varReg.get(column);
                 } else {
                     findFromMem(column.getName(), reg);
                 }
+                flag = 1;
             }
             //此时reg1的值为column，
-            Shift sll = new Shift(regK1,reg,2,"sll"); //把结果存入27
-            mipsBasicBlock.addInstruction(sll);
+            if (flag == 1) { //不是常数
+                Shift sll = new Shift(regK1, reg, 2, "sll"); //把结果存入27
+                mipsBasicBlock.addInstruction(sll);
+            }
             LlvmIrValue base = getelementptr.getBase();
             reg = 26; //reg复位
             if (isAllocated(base)) { //base在26或reg
@@ -611,11 +614,21 @@ public class MipsBasicBlockBuilder {
             }
             if (isAllocated(instruction)) {
                 int ans = getReg(instruction);
-                MipsCalculate mc = new MipsCalculate("addu",reg,regK1,ans);
-                mipsBasicBlock.addInstruction(mc);
+                if (flag == 1) { //不是常数
+                    MipsCalculate mc = new MipsCalculate("addu", reg, regK1, ans);
+                    mipsBasicBlock.addInstruction(mc);
+                } else {
+                    Addi addi = new Addi(reg,ans,4*Integer.parseInt(column.getName()));
+                    mipsBasicBlock.addInstruction(addi);
+                }
             } else {
-                MipsCalculate mc = new MipsCalculate("addu",reg,regK1,regK1);
-                mipsBasicBlock.addInstruction(mc);
+                if (flag == 1) {
+                    MipsCalculate mc = new MipsCalculate("addu", reg, regK1, regK1);
+                    mipsBasicBlock.addInstruction(mc);
+                } else {
+                    Addi addi = new Addi(reg,regK1,4*Integer.parseInt(column.getName()));
+                    mipsBasicBlock.addInstruction(addi);
+                }
                 if (name.charAt(0) == '%') {
                     if (mipsSymbolTable.containsMipsSymbol(name)) {
                         mipsSymbol = mipsSymbolTable.getMipsSymbol(name);

@@ -26,7 +26,11 @@ public class GlobalVarBuilder {
             ConstDeclNode constDeclNode = declNode.getConstDeclNode();
             ArrayList<ConstDefNode> constDefNodes = constDeclNode.getConstDefNodes();
             for (ConstDefNode constDefNode:constDefNodes) {
-                globalVars.add(generateGlobalConstVar(constDefNode));
+                if (constDefNode.getLBrackNum() != 0) {
+                    globalVars.add(generateGlobalConstVar(constDefNode));
+                } else {
+                    generateGlobalConstVar(constDefNode);
+                }
             }
         } else {
             VarDeclNode varDeclNode = declNode.getVarDeclNode();
@@ -77,7 +81,7 @@ public class GlobalVarBuilder {
         if (dim == 0) {
             ValueType intType = new IntType(32);
             Constant constant = new Constant(intType,symbol.getInit());
-            String name = "@" + symbol.getName();
+            String name = String.valueOf(symbol.getInit());
             globalVar = new GlobalVar(name,intType,constant,true,0);
             symbol.setLlvmIrValue(globalVar);
         } else if (dim == 1) {
