@@ -20,10 +20,10 @@ public class MipsCalculate extends MipsInstruction{
     public String mipsOutput() {
         StringBuilder sb = new StringBuilder();
         Register register = new Register();
-        if (op.equals("addu") || op.equals("subu") || op.equals("mul") || op.equals("div") || op.equals("and") || op.equals("or")) {
+        if (op.equals("addu") || op.equals("subu") || op.equals("mul")  || op.equals("and") || op.equals("or")) {
             sb.append(op).append(" ").append(register.getRegister(reg3)).append(", ").append(register.getRegister(reg1))
                     .append(", ").append(register.getRegister(reg2)).append("\n");
-        } else if (op.equals("srem")) {
+        } else if (op.equals("srem") || op.equals("div")) {
             sb.append("div").append(" ").append(register.getRegister(reg1)).append(", ").append(register.getRegister(reg2))
                     .append("\n");
         } else {

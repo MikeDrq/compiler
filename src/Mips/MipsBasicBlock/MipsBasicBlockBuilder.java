@@ -345,6 +345,10 @@ public class MipsBasicBlockBuilder {
             Mfhi mfhi = new Mfhi(reg3);
             mipsBasicBlock.addInstruction(mfhi);
         }
+        if (instr.equals("div")) {
+            Mflo mflo = new Mflo(reg3);
+            mipsBasicBlock.addInstruction(mflo);
+        }
         if (!isAllocated(instruction)) {
             MipsSymbol mipsSymbol = new MipsSymbol(name,offset,instruction);
             mipsSymbolTable.addMipsSymbol(name,mipsSymbol);

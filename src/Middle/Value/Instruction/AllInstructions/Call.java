@@ -128,7 +128,8 @@ public class Call extends Instruction {
     /*@Override
     public LlvmIrValue getDefine() {
         if (type == 0 || type == 1) {
-            return this;
+            if (!super.getName().equals("") )
+                return this;
         }
         return null;
     }*/
