@@ -1,7 +1,6 @@
 package Mips.MipsBasicBlock;
 
 import Middle.LlvmIrValue;
-import Middle.Type.PointerType;
 import Middle.Value.BasicBlock.BasicBlock;
 import Middle.Value.Instruction.AllInstructions.*;
 import Middle.Value.Instruction.Instruction;
@@ -11,8 +10,6 @@ import Mips.MipsInstruction.*;
 import Mips.MipsSymbolTable.MipsSymbol;
 import Mips.MipsSymbolTable.MipsSymbolTable;
 import Mips.Register;
-import Mips.GlobalLabelCnt;
-import SymbolTable.SymbolTable;
 
 import java.util.*;
 
@@ -398,15 +395,57 @@ public class MipsBasicBlockBuilder {
 
     public void isDiv(Instruction instruction,LlvmIrValue operand1,LlvmIrValue operand2,String instr) {
         int reg1 = dealOperand(operand1,1);
-        int reg2 = dealOperand(operand2,2);
+        int reg2 = 27;
         int reg3 = 26;
         if (isAllocated(instruction)) {
             reg3 = getReg(instruction);
         }
-        MipsCalculate mipsCalculate = new MipsCalculate(instr,reg1,reg2,reg3);
-        mipsBasicBlock.addInstruction(mipsCalculate);
-        Mflo mflo = new Mflo(reg3);
-        mipsBasicBlock.addInstruction(mflo);
+        if (isConstant(operand2.getName())) {
+            int constant = Integer.parseInt(operand2.getName());
+            if (constant == -1) {
+                MipsCalculate mipsCalculate = new MipsCalculate("subu",0,reg1,reg3);
+                mipsBasicBlock.addInstruction(mipsCalculate);
+            } else if (constant == 1) { //以防万一，但是应该不会出现
+                MipsCalculate mipsCalculate = new MipsCalculate("addu",0,reg1,reg3);
+                mipsBasicBlock.addInstruction(mipsCalculate);
+            } else {
+                int abs = constant > 0 ? constant : -constant;
+                if ((abs & (abs - 1)) == 0) { //2^n
+                    int t = abs;
+                    int cnt = -1;
+                    while(t != 0) { //cnt的值为n
+                        t = t / 2;
+                        cnt++;
+                    }
+                    //对于一个负数，其除以整数向上取整，需要让这个负数加上除数的大小减1（不减1的话-8/2这种会出问题），此时除法向下取整的结果等于原来的向上取整。
+                    Shift sra = new Shift(reg2,reg1,31,"sra"); //先算数右移，负数全是1，正数全是0
+                    mipsBasicBlock.addInstruction(sra);
+                    Shift srl = new Shift(reg2,reg2,32-cnt,"srl"); //随后进行逻辑右移，得到长度为cnt的0或1串
+                    mipsBasicBlock.addInstruction(srl);
+                    MipsCalculate mipsCalculate = new MipsCalculate("addu",reg2,reg1,reg2);
+                    mipsBasicBlock.addInstruction(mipsCalculate);
+                    sra = new Shift(reg3,reg2,cnt,"sra");
+                    mipsBasicBlock.addInstruction(sra);
+                    if (constant < 0) {
+                        mipsCalculate = new MipsCalculate("subu",0,reg3,reg3);
+                        mipsBasicBlock.addInstruction(mipsCalculate);
+                    }
+                } else { //普通
+                    //待优化
+                    reg2 = dealOperand(operand2,2);
+                    MipsCalculate mipsCalculate = new MipsCalculate(instr,reg1,reg2,reg3);
+                    mipsBasicBlock.addInstruction(mipsCalculate);
+                    Mflo mflo = new Mflo(reg3);
+                    mipsBasicBlock.addInstruction(mflo);
+                }
+            }
+        } else {
+            reg2 = dealOperand(operand2,2);
+            MipsCalculate mipsCalculate = new MipsCalculate(instr,reg1,reg2,reg3);
+            mipsBasicBlock.addInstruction(mipsCalculate);
+            Mflo mflo = new Mflo(reg3);
+            mipsBasicBlock.addInstruction(mflo);
+        }
         dealAns(instruction,instruction.getName(),reg3);
     }
 
@@ -556,7 +595,7 @@ public class MipsBasicBlockBuilder {
                 }
             }
             //此时reg1的值为column，
-            Sll sll = new Sll(regK1,reg,2); //把结果存入27
+            Shift sll = new Shift(regK1,reg,2,"sll"); //把结果存入27
             mipsBasicBlock.addInstruction(sll);
             LlvmIrValue base = getelementptr.getBase();
             reg = 26; //reg复位
@@ -623,7 +662,7 @@ public class MipsBasicBlockBuilder {
             }
             mipsCalculate = new MipsCalculate("addu", reg, regK1, regK1);
             mipsBasicBlock.addInstruction(mipsCalculate);
-            Sll sll = new Sll(regK1, regK1, 2);
+            Shift sll = new Shift(regK1, regK1, 2,"sll");
             mipsBasicBlock.addInstruction(sll);
             LlvmIrValue base = getelementptr.getBase();
             reg = 26; //reg复位，结果存储于27

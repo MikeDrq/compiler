@@ -1,26 +1,14 @@
 .data:
-k: .word 0
+a: .word 1, 2, 3, 4, 5
+z: .word 6
 
 .text:
 li $fp, 0x10040000
 j main
 
-func:
-label_0:
-li $k0, 3
-sw $k0, k
-jr $ra
-
 main:
-label_1:
-sw $ra, 0, ($sp)
-addi $sp, $sp, -4
-addi $fp, $fp, 0
-jal func
-addi $sp, $sp, 4
-addi $fp, $fp, 0
-lw $ra, 0, ($sp)
-li $k0, 5
+label_0:
+li $k0, 6
 move $a0, $k0
 li $v0, 1
 syscall

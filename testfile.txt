@@ -1,15 +1,7 @@
-int k;
-void func() {
-    int c = 4;
-    c = c * 5;
-    k = 3;
-    return;
-}
+const int a[5] = {1,2,3,4,5};
+const int z = 6;
 int main() {
-    int b;
-    func();
-    b = 2;
-    int a = 10;
-    printf("%d",a/b);
+    const int c = 6;
+    printf("%d",c);
     return 0;
 }
