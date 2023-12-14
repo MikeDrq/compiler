@@ -2,141 +2,17 @@ declare i32 @getint()
 declare void @putint(i32)
 declare void @putch(i32)
 declare void @putstr(i8*)
-@N = dso_local constant i32 10
-@a = dso_local global [10 x i32][i32 0,i32 1,i32 2,i32 3,i32 4,i32 5,i32 6,i32 7,i32 8,i32 9]
+@k = dso_local global i32 0
 
-define dso_local i32 @fib(i32 %v_0) #0 {
+define dso_local void @func() #0 {
 label_0:
-%v_3 = icmp eq i32 %v_0, 1
-%v_4 = zext i1 %v_3 to i32
-%v_5 = icmp ne i32 %v_4, 0
-br i1 %v_5,label %label_1,label %label_2
-label_1:
-ret  i32 1
-label_2:
-%v_7 = icmp eq i32 %v_0, 2
-%v_8 = zext i1 %v_7 to i32
-%v_9 = icmp ne i32 %v_8, 0
-br i1 %v_9,label %label_3,label %label_4
-label_3:
-ret  i32 2
-label_4:
-%v_11 = sub  i32 %v_0, 1
-%v_12 = call i32 @fib(i32 %v_11)
-%v_14 = sub  i32 %v_0, 2
-%v_15 = call i32 @fib(i32 %v_14)
-%v_16 = add  i32 %v_12, %v_15
-ret  i32 %v_16
+store i32 3, i32* @k
+ret void
 }
 
 define dso_local i32 @main() #0 {
-label_5:
-%v_2 = call i32 @getint()
-%v_3 = call i32 @getint()
-%v_6 = mul  i32 %v_2, %v_3
-%v_7 = sub  i32 0, %v_6
-%v_8 = call i32 @fib(i32 4)
-%v_9 = mul  i32 %v_7, %v_8
-%v_11 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 1
-%v_12 = load i32, i32* %v_11
-%v_14 = add  i32 %v_9, %v_12
-%v_17 = mul  i32 %v_14, 5
-%v_21 = call i32 @fib(i32 5)
-%v_22 = add  i32 %v_21, 2
-%v_23 = call i32 @fib(i32 %v_22)
-%v_24 = sub  i32 1197, %v_23
-%v_41 = add  i32 %v_24, -10091
-move %v_133, %v_17
-br label %label_6
-label_6:
-%v_45 = icmp slt i32 %v_133, 100
-%v_46 = zext i1 %v_45 to i32
-%v_47 = icmp ne i32 %v_46, 0
-br i1 %v_47,label %label_7,label %label_9
-label_7:
-%v_48 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 0
-%v_49 = load i32, i32* %v_48
-%v_53 = add  i32 %v_49, 36
-%v_54 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 0
-store i32 %v_53, i32* %v_54
-%v_55 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 1
-%v_56 = load i32, i32* %v_55
-%v_60 = add  i32 %v_56, 36
-%v_61 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 1
-store i32 %v_60, i32* %v_61
-%v_62 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 2
-%v_63 = load i32, i32* %v_62
-%v_67 = add  i32 %v_63, 36
-%v_68 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 2
-store i32 %v_67, i32* %v_68
-%v_69 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 3
-%v_70 = load i32, i32* %v_69
-%v_74 = add  i32 %v_70, 36
-%v_75 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 3
-store i32 %v_74, i32* %v_75
-%v_76 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 4
-%v_77 = load i32, i32* %v_76
-%v_81 = add  i32 %v_77, 36
-%v_82 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 4
-store i32 %v_81, i32* %v_82
-%v_83 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 5
-%v_84 = load i32, i32* %v_83
-%v_88 = add  i32 %v_84, 36
-%v_89 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 5
-store i32 %v_88, i32* %v_89
-%v_90 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 6
-%v_91 = load i32, i32* %v_90
-%v_95 = add  i32 %v_91, 36
-%v_96 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 6
-store i32 %v_95, i32* %v_96
-%v_97 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 7
-%v_98 = load i32, i32* %v_97
-%v_102 = add  i32 %v_98, 36
-%v_103 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 7
-store i32 %v_102, i32* %v_103
-%v_104 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 8
-%v_105 = load i32, i32* %v_104
-%v_109 = add  i32 %v_105, 36
-%v_110 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 8
-store i32 %v_109, i32* %v_110
-%v_111 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 9
-%v_112 = load i32, i32* %v_111
-%v_116 = add  i32 %v_112, 36
-%v_117 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 9
-store i32 %v_116, i32* %v_117
-br label %label_8
-label_8:
-%v_119 = add  i32 %v_133, 1
-move %v_133, %v_119
-br label %label_6
-label_9:
-move %v_132, 0
-br label %label_10
-label_10:
-%v_121 = icmp slt i32 %v_132, 10
-%v_122 = zext i1 %v_121 to i32
-%v_123 = icmp ne i32 %v_122, 0
-br i1 %v_123,label %label_11,label %label_13
-label_11:
-%v_125 = getelementptr [10 x i32], [10 x i32]* @a,i32 0,i32 %v_132
-%v_126 = load i32, i32* %v_125
-call void @putint(i32 %v_126)
-call void @putch(i32 44)
-call void @putch(i32 32)
-%v_128 = add  i32 %v_132, 1
-br label %label_12
-label_12:
-move %v_132, %v_128
-br label %label_10
-label_13:
-call void @putch(i32 10)
-call void @putint(i32 %v_132)
-call void @putch(i32 44)
-call void @putch(i32 32)
-call void @putint(i32 %v_41)
-call void @putch(i32 44)
-call void @putch(i32 32)
-call void @putint(i32 -6)
-call void @putch(i32 10)
+label_1:
+call void @func()
+call void @putint(i32 5)
 ret  i32 0
 }

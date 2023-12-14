@@ -125,14 +125,14 @@ public class Call extends Instruction {
         return sb.toString();
     }
 
-    /*@Override
-    public LlvmIrValue getDefine() {
+    @Override
+    public LlvmIrValue getDefine() { //不加则是第23次提交的结果
         if (type == 0 || type == 1) {
             if (!super.getName().equals("") )
                 return this;
         }
         return null;
-    }*/
+    }
 
     @Override
     public ArrayList<LlvmIrValue> getOperand() {

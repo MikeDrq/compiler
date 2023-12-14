@@ -290,65 +290,27 @@ public class MipsBasicBlockBuilder {
         }
     }
 
-    public void dealCalculate(Instruction instruction) {
-        String name = instruction.getName(); // name = operand1 op operand2
-        LlvmIrValue operand1 = ((Calculate) instruction).getLeft();
-        LlvmIrValue operand2 = ((Calculate) instruction).getRight();
-        String instr = "";
-        if (((Calculate) instruction).getInstructionType() == InstructionType.add) {
-            instr = "addu";
-        } else if (((Calculate) instruction).getInstructionType() == InstructionType.sub) {
-            instr = "subu";
-        } else if (((Calculate) instruction).getInstructionType() == InstructionType.mul) {
-            instr = "mul";
-        } else if (((Calculate) instruction).getInstructionType() == InstructionType.sdiv) {
-            instr = "div";
-        } else if (((Calculate) instruction).getInstructionType() == InstructionType.srem) {
-            instr = "srem";
-        } else if (((Calculate) instruction).getInstructionType() == InstructionType.icmp){
-            dealCompare(instruction,operand1,operand2);
-            return;
+    public int dealOperand(LlvmIrValue operand,int op) {
+        int reg;
+        if (op == 1) {
+            reg = 26;
         } else {
-            System.out.println("unexpected instr!");
+            reg = 27;
         }
-        String name1 = operand1.getName();
-        String name2 = operand2.getName();
-        int reg1 = 26; //$k0
-        int reg2 = 27; //$k1
-        int reg3 = 26;
-        if (isAllocated(instruction)) {
-            reg3 = getReg(instruction);
-        }
-        if (!isConstant(name1)) {
-            if (isAllocated(operand1)) {
-                reg1 = getReg(operand1);
+        if (!isConstant(operand.getName())) {
+            if (isAllocated(operand)) {
+                reg = getReg(operand);
             } else {
-                findFromMem(name1,reg1);
+                findFromMem(operand.getName(),reg);
             }
         } else {
-            Li li = new Li(reg1,Integer.parseInt(name1));
+            Li li = new Li(reg,Integer.parseInt(operand.getName()));
             mipsBasicBlock.addInstruction(li);
         }
-        if (!isConstant(name2)) {
-            if (isAllocated(operand2)) {
-                reg2 = getReg(operand2);
-            } else {
-                findFromMem(name2,reg2);
-            }
-        } else {
-            Li li = new Li(reg2,Integer.parseInt(name2));
-            mipsBasicBlock.addInstruction(li);
-        }
-        MipsCalculate mipsCalculate = new MipsCalculate(instr,reg1,reg2,reg3);
-        mipsBasicBlock.addInstruction(mipsCalculate);
-        if (instr.equals("srem")) {
-            Mfhi mfhi = new Mfhi(reg3);
-            mipsBasicBlock.addInstruction(mfhi);
-        }
-        if (instr.equals("div")) {
-            Mflo mflo = new Mflo(reg3);
-            mipsBasicBlock.addInstruction(mflo);
-        }
+        return reg;
+    }
+
+    public void dealAns(Instruction instruction,String name,int reg3) {
         if (!isAllocated(instruction)) {
             MipsSymbol mipsSymbol = new MipsSymbol(name,offset,instruction);
             mipsSymbolTable.addMipsSymbol(name,mipsSymbol);
@@ -361,7 +323,131 @@ public class MipsBasicBlockBuilder {
                 mipsBasicBlock.addInstruction(sw);
             }
         }
+    }
 
+    public void isAdd(Instruction instruction,LlvmIrValue operand1,LlvmIrValue operand2,String instr) {
+        int reg1;
+        int reg2;
+        int reg3 = 26;
+        if (isAllocated(instruction)) {
+            reg3 = getReg(instruction);
+        }
+        if (isConstant(operand1.getName())) {
+            reg2 = dealOperand(operand2,2);
+            Addi addi = new Addi(reg2,reg3,Integer.parseInt(operand1.getName()));
+            mipsBasicBlock.addInstruction(addi);
+        } else if (isConstant(operand2.getName())) {
+            reg1 = dealOperand(operand1,1);
+            Addi addi = new Addi(reg1,reg3,Integer.parseInt(operand2.getName()));
+            mipsBasicBlock.addInstruction(addi);
+        } else {
+            reg1 = dealOperand(operand1,1);
+            reg2 = dealOperand(operand2,2);
+            MipsCalculate mipsCalculate = new MipsCalculate(instr,reg1,reg2,reg3);
+            mipsBasicBlock.addInstruction(mipsCalculate);
+        }
+        dealAns(instruction,instruction.getName(),reg3);
+    }
+
+    public void isSub(Instruction instruction,LlvmIrValue operand1,LlvmIrValue operand2,String instr) {
+        int reg1;
+        int reg2;
+        int reg3 = 26;
+        if (isAllocated(instruction)) {
+            reg3 = getReg(instruction);
+        }
+        if (isConstant(operand2.getName())) {
+            reg1 = dealOperand(operand1,1);
+            Addi addi = new Addi(reg1,reg3,-1 * Integer.parseInt(operand2.getName()));
+            mipsBasicBlock.addInstruction(addi);
+        } else {
+            reg1 = dealOperand(operand1,1);
+            reg2 = dealOperand(operand2,2);
+            MipsCalculate mipsCalculate = new MipsCalculate(instr,reg1,reg2,reg3);
+            mipsBasicBlock.addInstruction(mipsCalculate);
+        }
+        dealAns(instruction,instruction.getName(),reg3);
+    }
+
+    public void isMult(Instruction instruction,LlvmIrValue operand1,LlvmIrValue operand2,String instr) {
+        int reg1;
+        int reg2;
+        int reg3 = 26;
+        if (isAllocated(instruction)) {
+            reg3 = getReg(instruction);
+        }
+        if (isConstant(operand1.getName())) {
+            reg2 = dealOperand(operand2,2);
+            Mul mul = new Mul(reg2,reg3,Integer.parseInt(operand1.getName()));
+            mipsBasicBlock.addInstruction(mul);
+        } else if (isConstant(operand2.getName())) {
+            reg1 = dealOperand(operand1,1);
+            Mul mul = new Mul(reg1,reg3,Integer.parseInt(operand2.getName()));
+            mipsBasicBlock.addInstruction(mul);
+        } else {
+            reg1 = dealOperand(operand1,1);
+            reg2 = dealOperand(operand2,2);
+            MipsCalculate mipsCalculate = new MipsCalculate(instr,reg1,reg2,reg3);
+            mipsBasicBlock.addInstruction(mipsCalculate);
+        }
+        if (isAllocated(instruction)) {
+            reg3 = getReg(instruction);
+        }
+        dealAns(instruction,instruction.getName(),reg3);
+    }
+
+    public void isDiv(Instruction instruction,LlvmIrValue operand1,LlvmIrValue operand2,String instr) {
+        int reg1 = dealOperand(operand1,1);
+        int reg2 = dealOperand(operand2,2);
+        int reg3 = 26;
+        if (isAllocated(instruction)) {
+            reg3 = getReg(instruction);
+        }
+        MipsCalculate mipsCalculate = new MipsCalculate(instr,reg1,reg2,reg3);
+        mipsBasicBlock.addInstruction(mipsCalculate);
+        Mflo mflo = new Mflo(reg3);
+        mipsBasicBlock.addInstruction(mflo);
+        dealAns(instruction,instruction.getName(),reg3);
+    }
+
+    public void isSrem(Instruction instruction,LlvmIrValue operand1,LlvmIrValue operand2,String instr) {
+        int reg1 = dealOperand(operand1,1);
+        int reg2 = dealOperand(operand2,2);
+        int reg3 = 26;
+        if (isAllocated(instruction)) {
+            reg3 = getReg(instruction);
+        }
+        MipsCalculate mipsCalculate = new MipsCalculate(instr,reg1,reg2,reg3);
+        mipsBasicBlock.addInstruction(mipsCalculate);
+        Mfhi mfhi = new Mfhi(reg3);
+        mipsBasicBlock.addInstruction(mfhi);
+        dealAns(instruction,instruction.getName(),reg3);
+    }
+
+    public void dealCalculate(Instruction instruction) {
+        LlvmIrValue operand1 = ((Calculate) instruction).getLeft();
+        LlvmIrValue operand2 = ((Calculate) instruction).getRight();
+        String instr = "";
+        if (((Calculate) instruction).getInstructionType() == InstructionType.add) {
+            instr = "addu";
+            isAdd(instruction,operand1,operand2,instr);
+        } else if (((Calculate) instruction).getInstructionType() == InstructionType.sub) {
+            instr = "subu";
+            isSub(instruction,operand1,operand2,instr);
+        } else if (((Calculate) instruction).getInstructionType() == InstructionType.mul) {
+            instr = "mul";
+            isMult(instruction,operand1,operand2,instr);
+        } else if (((Calculate) instruction).getInstructionType() == InstructionType.sdiv) {
+            instr = "div";
+            isDiv(instruction,operand1,operand2,instr);
+        } else if (((Calculate) instruction).getInstructionType() == InstructionType.srem) {
+            instr = "srem";
+            isSrem(instruction,operand1,operand2,instr);
+        } else if (((Calculate) instruction).getInstructionType() == InstructionType.icmp){
+            dealCompare(instruction,operand1,operand2);
+        } else {
+            System.out.println("unexpected instr!");
+        }
     }
 
     public void dealZext(Instruction instruction) {
