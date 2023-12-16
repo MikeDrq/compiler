@@ -4,7 +4,6 @@ import Middle.Value.BasicBlock.BasicBlock;
 import Middle.Value.BasicBlock.BasicBlockCnt;
 import Middle.Value.Func.Func;
 import Middle.Value.Func.FuncBuilder;
-import Middle.Value.Func.FuncCnt;
 import Middle.Value.GlobalVar.GlobalVar;
 import Middle.Value.GlobalVar.GlobalVarBuilder;
 import SymbolTable.SymbolTable;
@@ -37,15 +36,14 @@ public class LlvmIr {
             }
         }
         //BasicBlockCnt bbc = new BasicBlockCnt();
-        FuncCnt funcCnt = new FuncCnt();
         for (FuncDefNode funcDefNode:compUnitNode.getFuncDefNodes()) {
             FuncBuilder funcBuilder = new FuncBuilder(funcDefNode,symbolTable,basicBlockCnt);
-            Func func = funcBuilder.generateFunc(funcCnt);
+            Func func = funcBuilder.generateFunc();
             llvmIrModule.addFunc(func);
         }
         MainFuncDefNode mainFuncDefNode = compUnitNode.getMainFuncDefNode();
         FuncBuilder funcBuilder = new FuncBuilder(mainFuncDefNode,symbolTable,basicBlockCnt);
-        Func func = funcBuilder.generateMainFun(funcCnt);
+        Func func = funcBuilder.generateMainFun();
         llvmIrModule.addFunc(func);
         return llvmIrModule;
     }

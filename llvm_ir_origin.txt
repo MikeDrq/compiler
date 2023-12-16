@@ -35,72 +35,72 @@ ret  i32 %v_16
 
 define dso_local i32 @main() #0 {
 label_5:
-%v_0 = alloca i32
-store i32 2, i32* %v_0
-%v_1 = alloca i32
-store i32 5, i32* %v_1
-%v_2 = call i32 @getint()
-store i32 %v_2, i32* %v_0
-%v_3 = call i32 @getint()
-store i32 %v_3, i32* %v_1
-%v_4 = alloca [2 x i32]
-%v_5 = getelementptr [2 x i32], [2 x i32]* %v_4,i32 0,i32 0
-store i32 1, i32* %v_5
-%v_6 = getelementptr [2 x i32], [2 x i32]* %v_4,i32 0,i32 1
-store i32 2, i32* %v_6
-%v_7 = load i32, i32* %v_0
-%v_8 = load i32, i32* %v_1
-%v_9 = mul  i32 %v_7, %v_8
-%v_10 = sub  i32 0, %v_9
-%v_11 = call i32 @fib(i32 4)
-%v_12 = mul  i32 %v_10, %v_11
-%v_13 = add  i32 %v_12, 0
-%v_14 = call i32 @fib(i32 1)
-%v_15 = getelementptr [2 x i32], [2 x i32]* %v_4,i32 0,i32 %v_14
-%v_16 = load i32, i32* %v_15
-%v_17 = mul  i32 %v_16, 1
-%v_18 = add  i32 %v_13, %v_17
-%v_19 = sdiv  i32 1, 2
-%v_20 = sub  i32 %v_18, %v_19
-%v_21 = mul  i32 %v_20, 5
-store i32 %v_21, i32* %v_0
-%v_22 = mul  i32 7, 5923
-%v_23 = sdiv  i32 %v_22, 56
-%v_24 = mul  i32 %v_23, 56
-%v_25 = call i32 @fib(i32 6)
-%v_26 = call i32 @fib(i32 %v_25)
-%v_27 = sub  i32 %v_24, %v_26
-%v_28 = add  i32 1, 2
-%v_29 = sdiv  i32 89, 2
-%v_30 = mul  i32 %v_29, 36
-%v_31 = sub  i32 %v_30, 53
-%v_32 = sdiv  i32 %v_31, 1
-%v_33 = mul  i32 %v_32, 6
-%v_34 = sub  i32 %v_28, %v_33
-%v_35 = mul  i32 45, 56
-%v_36 = sdiv  i32 %v_35, 85
-%v_37 = sub  i32 %v_36, 56
-%v_38 = mul  i32 35, 56
-%v_39 = sdiv  i32 %v_38, 4
-%v_40 = add  i32 %v_37, %v_39
-%v_41 = sub  i32 %v_40, 9
-%v_42 = mul  i32 2, %v_41
-%v_43 = sub  i32 %v_34, %v_42
-%v_44 = add  i32 %v_27, %v_43
-store i32 %v_44, i32* %v_1
-%v_45 = alloca i32
-%v_46 = sub  i32 0, 5
-store i32 %v_46, i32* %v_45
-%v_47 = load i32, i32* %v_0
-%v_48 = load i32, i32* %v_1
-%v_49 = load i32, i32* %v_45
-call void @putint(i32 %v_47)
+%v_17 = alloca i32
+store i32 2, i32* %v_17
+%v_18 = alloca i32
+store i32 5, i32* %v_18
+%v_19 = call i32 @getint()
+store i32 %v_19, i32* %v_17
+%v_20 = call i32 @getint()
+store i32 %v_20, i32* %v_18
+%v_21 = alloca [2 x i32]
+%v_22 = getelementptr [2 x i32], [2 x i32]* %v_21,i32 0,i32 0
+store i32 1, i32* %v_22
+%v_23 = getelementptr [2 x i32], [2 x i32]* %v_21,i32 0,i32 1
+store i32 2, i32* %v_23
+%v_24 = load i32, i32* %v_17
+%v_25 = load i32, i32* %v_18
+%v_26 = mul  i32 %v_24, %v_25
+%v_27 = sub  i32 0, %v_26
+%v_28 = call i32 @fib(i32 4)
+%v_29 = mul  i32 %v_27, %v_28
+%v_30 = add  i32 %v_29, 0
+%v_31 = call i32 @fib(i32 1)
+%v_32 = getelementptr [2 x i32], [2 x i32]* %v_21,i32 0,i32 %v_31
+%v_33 = load i32, i32* %v_32
+%v_34 = mul  i32 %v_33, 1
+%v_35 = add  i32 %v_30, %v_34
+%v_36 = sdiv  i32 1, 2
+%v_37 = sub  i32 %v_35, %v_36
+%v_38 = mul  i32 %v_37, 5
+store i32 %v_38, i32* %v_17
+%v_39 = mul  i32 7, 5923
+%v_40 = sdiv  i32 %v_39, 56
+%v_41 = mul  i32 %v_40, 56
+%v_42 = call i32 @fib(i32 6)
+%v_43 = call i32 @fib(i32 %v_42)
+%v_44 = sub  i32 %v_41, %v_43
+%v_45 = add  i32 1, 2
+%v_46 = sdiv  i32 89, 2
+%v_47 = mul  i32 %v_46, 36
+%v_48 = sub  i32 %v_47, 53
+%v_49 = sdiv  i32 %v_48, 1
+%v_50 = mul  i32 %v_49, 6
+%v_51 = sub  i32 %v_45, %v_50
+%v_52 = mul  i32 45, 56
+%v_53 = sdiv  i32 %v_52, 85
+%v_54 = sub  i32 %v_53, 56
+%v_55 = mul  i32 35, 56
+%v_56 = sdiv  i32 %v_55, 4
+%v_57 = add  i32 %v_54, %v_56
+%v_58 = sub  i32 %v_57, 9
+%v_59 = mul  i32 2, %v_58
+%v_60 = sub  i32 %v_51, %v_59
+%v_61 = add  i32 %v_44, %v_60
+store i32 %v_61, i32* %v_18
+%v_62 = alloca i32
+%v_63 = sub  i32 0, 5
+store i32 %v_63, i32* %v_62
+%v_64 = load i32, i32* %v_17
+%v_65 = load i32, i32* %v_18
+%v_66 = load i32, i32* %v_62
+call void @putint(i32 %v_64)
 call void @putch(i32 44)
 call void @putch(i32 32)
-call void @putint(i32 %v_48)
+call void @putint(i32 %v_65)
 call void @putch(i32 44)
 call void @putch(i32 32)
-call void @putint(i32 %v_49)
+call void @putint(i32 %v_66)
 call void @putch(i32 10)
 ret  i32 0
 }

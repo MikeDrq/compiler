@@ -11,8 +11,4 @@ public class FuncCnt {
         cnt++;
         return num;
     }
-
-    public int fetchCnt() {
-        return cnt;
-    }
 }
