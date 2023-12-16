@@ -8,7 +8,7 @@ public class Mul extends MipsInstruction {
     private int reg2; //目标
     private int imme;
 
-    public Mul(int reg1,int reg2,int imme) {
+    public Mul(int reg1,int reg2,int imme) { //mul reg2,reg1,imme
         super("mul");
         this.reg1 = reg1;
         this.reg2 = reg2;

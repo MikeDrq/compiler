@@ -40,10 +40,9 @@ public class FuncBuilder {
         this.basicBlockCnt = basicBlockCnt;
     }
 
-    public Func generateFunc() {
+    public Func generateFunc(FuncCnt funcCnt) {
         ValueType type;
         ValueType ret;
-        FuncCnt funcCnt = new FuncCnt();
         if (funcDefNode.getFuncType().getTokenType() == TokenType.INTTK) {
             ret = new IntType(32);
         } else {
@@ -121,10 +120,10 @@ public class FuncBuilder {
         return llvmIrValue;
     }
 
-    public Func generateMainFun() {
+    public Func generateMainFun(FuncCnt funcCnt) {
         ValueType type;
         ValueType ret = new IntType(32);
-        FuncCnt funcCnt = new FuncCnt();
+        funcCnt = new FuncCnt();
         ArrayList<LlvmIrValue> paramsValueType = new ArrayList<>();
         ArrayList<Symbol> params = new ArrayList<>();
         Symbol symbol = new Symbol(mainFuncDefNode.getMain(),SymbolType.FUNC);

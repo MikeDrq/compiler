@@ -16,6 +16,8 @@ public class Opt {
     public void doOpt() {
         MemToReg memToReg = new MemToReg(llvmIrModule);
         memToReg.doMemToReg(); //mem2reg优化
+        FuncInlining funcInlining = new FuncInlining(llvmIrModule);
+        funcInlining.doFuncInlining();
         Gvn gvn = new Gvn(llvmIrModule);
         gvn.doGvn();
         RegAllocate regAllocate = new RegAllocate(llvmIrModule);
