@@ -5,7 +5,9 @@ import Middle.LlvmIrValue;
 import Middle.Type.IntType;
 import Middle.Value.BasicBlock.BasicBlock;
 import Middle.Value.Func.Func;
+import Middle.Value.Instruction.AllInstructions.Br;
 import Middle.Value.Instruction.AllInstructions.Calculate;
+import Middle.Value.Instruction.AllInstructions.Getelementptr;
 import Middle.Value.Instruction.Instruction;
 import Middle.Value.Instruction.InstructionType;
 
@@ -15,16 +17,23 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class Gvn {
-    public LlvmIrModule llvmIrModule;
+    private LlvmIrModule llvmIrModule;
+    private HashMap<String,LlvmIrValue> map;
 
     public Gvn(LlvmIrModule llvmIrModule) {
         this.llvmIrModule = llvmIrModule;
+        this.map = new HashMap<>();
     }
 
     public void doGvn() {
         ArrayList<Func> funcs = llvmIrModule.getFunctions();
         for (Func func : funcs) {
             simplifyCalculate(func);
+        }
+        for (Func func : funcs) {
+            map = new HashMap<>();
+            ArrayList<BasicBlock> basicBlocks = func.getBasicBlocks();
+            //doGVN(basicBlocks.get(0));
         }
     }
 
@@ -137,6 +146,46 @@ public class Gvn {
                             iterator.remove();
                         }
                     }
+                }
+            }
+        }
+    }
+
+    public void doGVN(BasicBlock basicBlock) {
+        LinkedList<Instruction> instructions = basicBlock.getInstructions();
+        Iterator<Instruction> iterator = instructions.iterator();
+        ArrayList<Instruction> my = new ArrayList<>();
+        while (iterator.hasNext()) {
+            Instruction instruction = iterator.next();
+            if (instruction.getKey() != null) {
+                if (map.containsKey(instruction.getKey())) {
+                    changeOneUse(basicBlock,instruction.getName(),map.get(instruction.getKey()));
+                    iterator.remove();
+                } else {
+                    map.put(instruction.getKey(),instruction);
+                    System.out.println(instruction.getKey());
+                    my.add(instruction);
+                }
+            }
+        }
+        ArrayList<BasicBlock> basicBlocks = basicBlock.getDomain();
+        for (BasicBlock b : basicBlocks) {
+            doGVN(b);
+        }
+
+        for (Instruction instruction : my) {
+            map.remove(instruction.getKey());
+        }
+    }
+
+
+    public void changeOneUse(BasicBlock basicBlock,String name,LlvmIrValue l) {
+        LinkedList<Instruction> instructions = basicBlock.getInstructions();
+        for (Instruction instruction : instructions) {
+            ArrayList<LlvmIrValue> operands = instruction.getOperand();
+            for (LlvmIrValue operand : operands) {
+                if (operand.getName().equals(name)) {
+                    instruction.change(name,l);
                 }
             }
         }

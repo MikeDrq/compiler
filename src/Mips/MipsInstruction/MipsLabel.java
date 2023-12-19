@@ -7,6 +7,10 @@ public class MipsLabel extends MipsInstruction {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String mipsOutput() {
         return "label_" + name + ":\n";

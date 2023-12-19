@@ -89,6 +89,20 @@ public class Getelementptr extends Instruction {
         }
     }
 
+    /*@Override
+    public String getKey() {
+        if (dim == 1) {
+            if (super.getRParamDim() != 1) {
+                return base.getName() + " " + offset_column_value.getName();
+            }
+        } else {
+            if (super.getRParamDim() != 1 && super.getRParamDim() != 2) {
+                return base.getName() + " " + offset_row_value.getName() + " " + offset_column_value.getName();
+            }
+        }
+        return null;
+    }*/
+
     //<result> = getelementptr <ty>, * {, [inrange] <ty> <idx>}*
     @Override
     public String midOutput() {

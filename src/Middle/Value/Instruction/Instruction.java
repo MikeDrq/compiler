@@ -40,5 +40,7 @@ public class Instruction extends LlvmIrValue {
         return s;
     }
 
-
+    public String getKey() {
+        return null;
+    }
 }

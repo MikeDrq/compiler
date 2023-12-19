@@ -7,6 +7,10 @@ public class J extends MipsInstruction {
         this.label = label;
     }
 
+    public String getLabel() {
+        return label;
+    }
+
     @Override
     public String mipsOutput() {
         StringBuilder sb = new StringBuilder();

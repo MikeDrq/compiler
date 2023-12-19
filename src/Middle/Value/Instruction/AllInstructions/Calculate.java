@@ -98,4 +98,19 @@ public class Calculate extends Instruction {
             this.right = llvmIrValue;
         }
     }
+
+    @Override
+    public String getKey() {
+        if (instructionType == InstructionType.add || instructionType == InstructionType.mul) {
+            if (left.getName().compareTo(right.getName()) < 0) {
+                return left.getName() + " " + instructionType.toString() + " " + right.getName();
+            } else {
+                return right.getName() + " " + instructionType.toString() + " " + right.getName();
+            }
+        } else if (!(instructionType == InstructionType.icmp)){
+            return  left.getName() + " " + instructionType.toString() + " " + right.getName();
+        } else {
+            return  left.getName() + " " + cond + " " + right.getName();
+        }
+    }
 }

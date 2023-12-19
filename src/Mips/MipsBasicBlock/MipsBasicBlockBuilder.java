@@ -508,8 +508,10 @@ public class MipsBasicBlockBuilder {
         }
         if (isAllocated(instruction)) {
             reg2 =getReg(instruction);
-            Move move = new Move(reg2,reg1);
-            mipsBasicBlock.addInstruction(move);
+            if (reg2 != reg1) {
+                Move move = new Move(reg2, reg1);
+                mipsBasicBlock.addInstruction(move);
+            }
         } else {
             int pos = 0;
             if (name.charAt(0) == '%') {
@@ -794,8 +796,10 @@ public class MipsBasicBlockBuilder {
                 Li li = new Li(reg,Integer.parseInt(name));
                 mipsBasicBlock.addInstruction(li);
             }
-            Move move = new Move(2,reg);
-            mipsBasicBlock.addInstruction(move);
+            if (reg != 2) {
+                Move move = new Move(2, reg);
+                mipsBasicBlock.addInstruction(move);
+            }
             if (isMain) {
                 Li li = new Li(2,10);
                 mipsBasicBlock.addInstruction(li);
@@ -824,8 +828,10 @@ public class MipsBasicBlockBuilder {
                     findFromMem(name, reg);
                 }
             }
-            Move move = new Move(4,reg);
-            mipsBasicBlock.addInstruction(move);
+            if (reg != 4) {
+                Move move = new Move(4, reg);
+                mipsBasicBlock.addInstruction(move);
+            }
             Li li = new Li(2,1);
             mipsBasicBlock.addInstruction(li);
             Syscall syscall = new Syscall();
@@ -838,8 +844,10 @@ public class MipsBasicBlockBuilder {
             String name = call.getName();
             if (!isConstant(name)) {
                 if (isAllocated(call)) {
-                    Move move = new Move(getReg(call),2);
-                    mipsBasicBlock.addInstruction(move);
+                    if (getReg(call) != 2) {
+                        Move move = new Move(getReg(call), 2);
+                        mipsBasicBlock.addInstruction(move);
+                    }
                 } else {
                     if (name.charAt(0) == '%') {
                         int pos;
@@ -892,8 +900,10 @@ public class MipsBasicBlockBuilder {
                         Lw lw = new Lw(a1 + i, 29, reflection.get(reg));
                         mipsBasicBlock.addInstruction(lw);
                     } else {
-                        Move move = new Move(a1+i,reg);
-                        mipsBasicBlock.addInstruction(move);
+                        if (a1 + i != reg) {
+                            Move move = new Move(a1 + i, reg);
+                            mipsBasicBlock.addInstruction(move);
+                        }
                     }
                 } else {
                     Sw sw = new Sw(reg, 29, offset); //内存的位置存进去
@@ -933,8 +943,10 @@ public class MipsBasicBlockBuilder {
                 String name = call.getName();
                 if (isAllocated(call)) {
                     int reg = getReg(call);
-                    Move move = new Move(reg,2);
-                    mipsBasicBlock.addInstruction(move);
+                    if (reg != 2) {
+                        Move move = new Move(reg, 2);
+                        mipsBasicBlock.addInstruction(move);
+                    }
                 }  else {
                     if (name.charAt(0) == '%') {
                         if (mipsSymbolTable.containsMipsSymbol(name)) {
@@ -974,14 +986,17 @@ public class MipsBasicBlockBuilder {
             if (isAllocated(src)) {
                 reg2 = getReg(src);
             } else {
+                System.out.println(src.getName());
                 findFromMem(src.getName(), reg2);
             }
         }
         if (isAllocated(dst)) {
             reg1 = getReg(dst);
             if (flag == 0) {
-                Move move = new Move(reg1,reg2);
-                mipsBasicBlock.addInstruction(move);
+                if (reg1 != reg2) {
+                    Move move = new Move(reg1, reg2);
+                    mipsBasicBlock.addInstruction(move);
+                }
             } else {
                 Li li = new Li(reg1,Integer.parseInt(src.getName()));
                 mipsBasicBlock.addInstruction(li);

@@ -49,10 +49,10 @@ public class Load extends Instruction {
 
     @Override
     public void change(String name,LlvmIrValue l) {
-        if (l.getName().equals(name)) {
+        //if (l.getName().equals(name)) {
             this.llvmIrValue = l;
-        } else {
-            System.out.println("error when replace load");
-        }
+        //} else {
+          //  System.out.println("error when replace load");
+        //}
     }
 }

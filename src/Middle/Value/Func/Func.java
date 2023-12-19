@@ -2,10 +2,7 @@ package Middle.Value.Func;
 
 import Middle.LlvmIrModule;
 import Middle.LlvmIrValue;
-import Middle.Type.FuncType;
-import Middle.Type.PhiType;
-import Middle.Type.PointerType;
-import Middle.Type.ValueType;
+import Middle.Type.*;
 import Middle.Value.BasicBlock.BasicBlock;
 import Middle.Value.Instruction.AllInstructions.Alloca;
 import Middle.Value.Instruction.AllInstructions.Br;
@@ -22,11 +19,13 @@ public class Func extends LlvmIrValue {
     private ArrayList<BasicBlock> basicBlocks = new ArrayList<>();
     private HashMap<String,String> iDom = new HashMap<>();
     private HashMap<LlvmIrValue,Integer> varReg;
+    private ValueType retValue;
 
     private FuncCnt funcCnt;
     public Func(String name,ValueType valueType,FuncCnt funcCnt) {
         super(name,valueType);
         params = ((FuncType) super.getType()).getParams();
+        retValue = ((FuncType) super.getType()).getRetType();
         this.funcCnt = funcCnt;
     }
 
@@ -44,6 +43,13 @@ public class Func extends LlvmIrValue {
 
     public ArrayList<BasicBlock> getBasicBlocks() {
         return basicBlocks;
+    }
+
+    public Boolean hasRetValue() {
+        if (retValue instanceof IntType) {
+            return true;
+        }
+        return false;
     }
 
     public String midOutput() {

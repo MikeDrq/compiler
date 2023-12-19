@@ -28,22 +28,26 @@ public class FuncBuilder {
 
     private BasicBlockCnt basicBlockCnt;
 
-    public FuncBuilder (FuncDefNode funcDefNode, SymbolTable symbolTable, BasicBlockCnt basicBlockCnt) {
+    private FuncCnt funcCnt;
+
+    public FuncBuilder (FuncDefNode funcDefNode, SymbolTable symbolTable, BasicBlockCnt basicBlockCnt,FuncCnt funcCnt) {
         this.funcDefNode = funcDefNode;
         this.symbolTable = symbolTable;
         this.basicBlockCnt = basicBlockCnt;
+        this.funcCnt = funcCnt;
     }
 
-    public FuncBuilder(MainFuncDefNode mainFuncDefNode,SymbolTable symbolTable,BasicBlockCnt basicBlockCnt) {
+    public FuncBuilder(MainFuncDefNode mainFuncDefNode,SymbolTable symbolTable,BasicBlockCnt basicBlockCnt,FuncCnt funcCnt) {
         this.mainFuncDefNode = mainFuncDefNode;
         this.symbolTable = symbolTable;
         this.basicBlockCnt = basicBlockCnt;
+        this.funcCnt = funcCnt;
     }
 
     public Func generateFunc() {
         ValueType type;
         ValueType ret;
-        FuncCnt funcCnt = new FuncCnt();
+        //FuncCnt funcCnt = new FuncCnt();
         if (funcDefNode.getFuncType().getTokenType() == TokenType.INTTK) {
             ret = new IntType(32);
         } else {
@@ -124,7 +128,7 @@ public class FuncBuilder {
     public Func generateMainFun() {
         ValueType type;
         ValueType ret = new IntType(32);
-        FuncCnt funcCnt = new FuncCnt();
+        //FuncCnt funcCnt = new FuncCnt();
         ArrayList<LlvmIrValue> paramsValueType = new ArrayList<>();
         ArrayList<Symbol> params = new ArrayList<>();
         Symbol symbol = new Symbol(mainFuncDefNode.getMain(),SymbolType.FUNC);

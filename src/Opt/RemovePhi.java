@@ -192,7 +192,7 @@ public class RemovePhi {
                 if (flag == 1) {
                     int num = funcCnt.getCnt();
                     LlvmIrValue llvmIrValue = new LlvmIrValue("%v_" + num, new IntType(num));
-                    MidMove move = new MidMove("", null, llvmIrValue, moves.get(i).getDst());
+                    MidMove move = new MidMove("", null, moves.get(i).getDst(),llvmIrValue);
                     temp.add(move);
                     for (MidMove item : moves) {
                         if (item.getSrc().getName().equals(s)) {
